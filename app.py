@@ -23,4 +23,9 @@ def index():
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    return {}
+    translation = language_translator.translate(
+        text=request.form.get('text'),
+        target=request.form.get('target'),
+        source=request.form.get('source')
+    ).get_result()
+    return translation
