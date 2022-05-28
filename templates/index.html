@@ -14,21 +14,27 @@
         <div class="row">
             <div class="column col-md-6">
                 <select class="form-select" aria-label="Default select language">
+                    <option value="detect">Detect Language</option>
+                    <optgroup label="Languages">
                     {% for l in languages -%}
                         {% if l.supported_as_source %}
                             <option value="{{l.language}}">{{l.language_name}}</option>
                         {% endif %}
                     {% endfor %}
+                    </optgroup>
                 </select>
                 <textarea aria-label="Input text area" placeholder="Enter text" rows="3"></textarea>
             </div>
             <div class="column col-md-6 output">
-                <select class="form-select" aria-label="Default select language">
+                <select class="form-select" aria-label="Default select language" required>
+                    <option value="">-Select-</option>
+                    <optgroup label="Languages">
                     {% for l in languages -%}
                         {% if l.supported_as_target %}
                             <option value="{{l.language}}">{{l.language_name}}</option>
                         {% endif %}
                     {% endfor %}
+                    </optgroup>
                 </select>
                 <div id="translation" aria-label="Output text area">Translation</div>
             </div>
