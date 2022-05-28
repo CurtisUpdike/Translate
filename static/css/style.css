@@ -123,12 +123,12 @@ button {
     right: calc(var(--gutter) * 0.5);
 }
 
-.button:hover {
-    background-color: #0b5ed7;
+button:hover {
+    background-color: #0a64eb;
     border-color: #0a58ca;
 }
 
-.button:active {
+button:active {
     background-color: #0a58ca;
     border-color: #0a53be;
 }
