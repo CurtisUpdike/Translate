@@ -5,25 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
-    <title>Translator</title>
+    <title>Translate</title>
 </head>
 <body>
-    <h1>Translator</h1>
+    <h1>Translate</h1>
+
     <form class="container">
         <div class="row">
             <div class="column col-md-6">
                 <select class="form-select" aria-label="Default select language">
-                    <option value="1" selected>English</option>
-                    <option value="2">Spanish</option>
-                    <option value="3">French</option>
+                    {% for l in languages -%}
+                        {% if l.supported_as_source %}
+                            <option value="{{l.language}}">{{l.language_name}}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
                 <textarea aria-label="Input text area" placeholder="Enter text" rows="3"></textarea>
             </div>
             <div class="column col-md-6 output">
                 <select class="form-select" aria-label="Default select language">
-                    <option value="1">English</option>
-                    <option value="2" selected>Spanish</option>
-                    <option value="3">French</option>
+                    {% for l in languages -%}
+                        {% if l.supported_as_target %}
+                            <option value="{{l.language}}">{{l.language_name}}</option>
+                        {% endif %}
+                    {% endfor %}
                 </select>
                 <div id="translation" aria-label="Output text area">Translation</div>
             </div>
