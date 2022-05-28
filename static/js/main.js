@@ -1,8 +1,8 @@
-const button = document.querySelector('button');
-button.addEventListener('click', event => {
+const form = document.querySelector('form');
+const output = document.querySelector('#translation');
+
+form.addEventListener('submit', function (event) {
     event.preventDefault();
-    fetch('/translate', { method: 'POST' })
-        .then(response => response.text())
-        .then(data => console.log(data))
-        .catch(error => console.error(error));
+    var formData = new FormData(this);
+    fetch('/translate', { method: 'POST', body: formData })
 });
