@@ -18,6 +18,7 @@ language_translator.set_default_headers({'x-watson-learning-opt-out': "true"})
 @app.route('/')
 def index():
     languages = language_translator.list_languages().get_result()['languages']
+    languages = sorted(languages, key=lambda d: d['language_name'])
     return render_template('index.html', languages=languages)
 
 
