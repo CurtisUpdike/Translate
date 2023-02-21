@@ -1,10 +1,20 @@
 ﻿@page
 @model IndexModel
-@{
-    ViewData["Title"] = "Home page";
-}
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="grid">
+    <div>
+        <select name="source" class="form-select" aria-label="Source language">
+            <option value="">Source Language</option>
+        </select>
+        <textarea cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
+        <div>
+            <button>Translate</button>
+        </div>
+    </div>
+    <div>
+        <select name="target" class="form-select" aria-label="Target language">
+            <option value="">Target Language</option>
+        </select>
+        <textarea cols="80" rows="10" placeholder="Translation" readonly></textarea>
+    </div>
 </div>

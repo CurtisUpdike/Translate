@@ -19,4 +19,7 @@ html {
 
 body {
   margin-bottom: 60px;
+  font-family: "IBM Plex Sans", Arial, Helvetica, sans-serif;
+  background-color: #161616;
+  color: #FFF;      
 }
