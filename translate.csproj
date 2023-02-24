@@ -4,6 +4,11 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>91ad12e9-b611-4f98-b738-32a32119b8bb</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IBM.Watson.LanguageTranslator.v3" Version="6.1.0" />
+  </ItemGroup>
 
 </Project>
