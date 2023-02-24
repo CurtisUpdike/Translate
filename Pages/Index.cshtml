@@ -4,7 +4,13 @@
 <div class="grid">
     <div>
         <select name="source" class="form-select" aria-label="Source language">
-            <option value="">Source Language</option>
+            @foreach (var l in Model.Languages)
+            {
+                if (l.SupportedAsSource == true)
+                {
+                    <option value="@l.CountryCode">@l.LanguageName</option>
+                }
+            }
         </select>
         <textarea cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
         <div>
@@ -13,7 +19,13 @@
     </div>
     <div>
         <select name="target" class="form-select" aria-label="Target language">
-            <option value="">Target Language</option>
+            @foreach (var l in Model.Languages)
+            {
+                if (l.SupportedAsTarget == true)
+                {
+                    <option value="@l.CountryCode">@l.LanguageName</option>
+                }
+            }
         </select>
         <textarea cols="80" rows="10" placeholder="Translation" readonly></textarea>
     </div>

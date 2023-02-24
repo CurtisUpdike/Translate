@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using IBM.Watson.LanguageTranslator.v3;
 using IBM.Cloud.SDK.Core.Authentication.Iam;
+using IBM.Watson.LanguageTranslator.v3.Model;
 
 namespace Translate.Pages
 {
@@ -10,6 +11,9 @@ namespace Translate.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IConfiguration _config;
         private readonly LanguageTranslatorService _translator;
+
+        [BindProperty]
+        public List<Language> Languages { get; set; }
 
         public IndexModel(ILogger<IndexModel> logger, IConfiguration config)
         {
@@ -24,6 +28,8 @@ namespace Translate.Pages
             languageTranslator.SetServiceUrl(_config["Translator:Url"]);
             languageTranslator.WithHeader("X-Watson-Learning-Opt-Out", "true");
             _translator = languageTranslator;
+
+            Languages = _translator.ListLanguages().Result._Languages.ToList();
         }
 
         public void OnGet()
