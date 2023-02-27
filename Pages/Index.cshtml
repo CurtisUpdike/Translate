@@ -1,32 +1,19 @@
 ﻿@page
 @model IndexModel
 
-<div class="grid">
+<form class="grid" method="post">
     <div>
-        <select name="source" class="form-select" aria-label="Source language">
-            @foreach (var l in Model.Languages)
-            {
-                if (l.SupportedAsSource == true)
-                {
-                    <option value="@l.CountryCode">@l.LanguageName</option>
-                }
-            }
+        <select asp-for="SourceLanguage" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
         </select>
-        <textarea cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
+        <textarea asp-for="SourceText" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
         <div>
             <button>Translate</button>
         </div>
     </div>
     <div>
-        <select name="target" class="form-select" aria-label="Target language">
-            @foreach (var l in Model.Languages)
-            {
-                if (l.SupportedAsTarget == true)
-                {
-                    <option value="@l.CountryCode">@l.LanguageName</option>
-                }
-            }
+        <select asp-for="TargetLanguage" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">
+
         </select>
-        <textarea cols="80" rows="10" placeholder="Translation" readonly></textarea>
+        <textarea cols="80" rows="10" placeholder="Translation" readonly>@Model.TargetText</textarea>
     </div>
-</div>
+</form>

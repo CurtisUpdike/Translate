@@ -1,40 +1,67 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using IBM.Watson.LanguageTranslator.v3;
-using IBM.Cloud.SDK.Core.Authentication.Iam;
-using IBM.Watson.LanguageTranslator.v3.Model;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Translate.Models;
+using Translate.Services;
 
-namespace Translate.Pages
+namespace Translate.Pages;
+
+[BindProperties]
+public class IndexModel : PageModel
 {
-    public class IndexModel : PageModel
+    private readonly ITranslator _translator;
+
+    public List<SelectListItem>? SourceOptions { get; set; }
+    public List<SelectListItem>? TargetOptions { get; set; }
+
+    public string SourceLanguage { get; set; } = "en";
+    public string TargetLanguage { get; set; } = "es";
+    public string SourceText { get; set; } = string.Empty;
+    public string TargetText { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+
+    public IndexModel(ITranslator translator)
     {
-        private readonly ILogger<IndexModel> _logger;
-        private readonly IConfiguration _config;
-        private readonly LanguageTranslatorService _translator;
+        _translator = translator;
+        SetOptions();
+    }
 
-        [BindProperty]
-        public List<Language> Languages { get; set; }
+    public void OnGet()
+    {
 
-        public IndexModel(ILogger<IndexModel> logger, IConfiguration config)
+    }
+
+    public void OnPost()
+    {
+        if (SourceLanguage != TargetLanguage)
         {
-            _logger = logger;
-            _config = config;
+            var translation = _translator.Translate(new Translation 
+                { 
+                    SourceLanguage = _translator.Languages.First(l => l.Id == SourceLanguage),
+                    TargetLanguage = _translator.Languages.First(l => l.Id == TargetLanguage),
+                    SourceText = SourceText
+                });
 
-            IamAuthenticator authenticator = new IamAuthenticator(
-                apikey: _config["Translator:ApiKey"]
-            );
-
-            LanguageTranslatorService languageTranslator = new LanguageTranslatorService("2018-05-01", authenticator);
-            languageTranslator.SetServiceUrl(_config["Translator:Url"]);
-            languageTranslator.WithHeader("X-Watson-Learning-Opt-Out", "true");
-            _translator = languageTranslator;
-
-            Languages = _translator.ListLanguages().Result._Languages.ToList();
+            TargetText = translation.TargetText;
+        } 
+        else
+        { 
+            TargetText = SourceText; 
         }
 
-        public void OnGet()
-        {
+        SetOptions();
+    }
 
-        }
+    public void SetOptions()
+    {
+        SourceOptions = (from l in _translator.Languages
+                         where l.SupportedAsSource == true
+                         orderby l.Name
+                         select new SelectListItem { Value = l.Id, Text = l.Name }).ToList();
+
+        TargetOptions = (from l in _translator.Languages
+                         where l.SupportedAsTarget == true
+                         orderby l.Name
+                         select new SelectListItem { Value = l.Id, Text = l.Name }).ToList();
     }
 }
