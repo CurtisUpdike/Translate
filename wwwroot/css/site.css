@@ -14,22 +14,38 @@ html {
 
 html {
   position: relative;
-  min-height: 100%;
+  height: 100%;
 }
 
 body {
   margin-bottom: 60px;
   font-family: "IBM Plex Sans", Arial, Helvetica, sans-serif;
   background-color: #161616;
-  color: #FFF;      
+  color: #FFF; 
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1
 }
 
 .grid {
     margin: 0 auto;
-    max-width: 700px;
+    max-width: 1300px;
     display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    max-width: 700px;
+    grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
     row-gap: 2rem;
+  }
 }
 
 .form-select {
@@ -57,10 +73,10 @@ textarea {
     width: 100%;
 }
 
-    textarea:active,
-    textarea:focus {
-        outline: 2px solid #fff;
-    }
+textarea:active,
+textarea:focus {
+    outline: 2px solid #fff;
+}
 
 button {
     background-color: #0f62fe;
@@ -84,4 +100,8 @@ button:hover {
 
 button:active {
     background-color: #002d9c;
+}
+
+.footer {
+  padding: 1rem;
 }
