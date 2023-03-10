@@ -33,20 +33,20 @@ public class IndexModel : PageModel
 
     public void OnPost()
     {
-        if (SourceLanguage != TargetLanguage)
+        if (!string.IsNullOrEmpty(SourceText) && SourceLanguage != TargetLanguage)
         {
-            var translation = _translator.Translate(new Translation 
-                { 
-                    SourceLanguage = _translator.Languages.First(l => l.Id == SourceLanguage),
-                    TargetLanguage = _translator.Languages.First(l => l.Id == TargetLanguage),
-                    SourceText = SourceText
-                });
+            var translation = _translator.Translate(new Translation
+            {
+                SourceLanguage = _translator.Languages.First(l => l.Id == SourceLanguage),
+                TargetLanguage = _translator.Languages.First(l => l.Id == TargetLanguage),
+                SourceText = SourceText
+            });
 
             TargetText = translation.TargetText;
-        } 
+        }
         else
-        { 
-            TargetText = SourceText; 
+        {
+            TargetText = SourceText;
         }
 
         SetOptions();
