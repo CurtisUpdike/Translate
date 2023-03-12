@@ -102,6 +102,16 @@ button:active {
     background-color: #002d9c;
 }
 
+#sourceControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#characterLimit {
+  font-size: 14px;
+}
+
 .footer {
   padding: 1rem;
 }
