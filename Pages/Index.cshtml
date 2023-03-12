@@ -6,7 +6,7 @@
         <select asp-for="SourceLanguage" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
         </select>
         <textarea asp-for="SourceText" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
-        <div>
+        <div id="sourceControls">
             <button>Translate</button>
         </div>
     </div>
@@ -17,3 +17,19 @@
         <textarea cols="80" rows="10" placeholder="Translation" readonly>@Model.TargetText</textarea>
     </div>
 </form>
+
+<script>
+    const sourceText = document.getElementById('SourceText');
+    const sourceControls = document.getElementById('sourceControls');
+
+    const characterLimit = document.createElement('span');
+    characterLimit.id = 'characterLimit';
+    characterLimit.textContent = `${sourceText.value.length}/10000`;
+    sourceControls.append(characterLimit);
+
+    sourceText.addEventListener('input', handleTextChange);
+
+    function handleTextChange() {
+        characterLimit.textContent = `${sourceText.value.length}/10000`;
+    }
+</script>
