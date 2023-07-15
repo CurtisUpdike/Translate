@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Translate.Models;
 using Translate.Services;
+using Translate.Models;
 
 namespace Translate.Pages;
 
@@ -11,57 +11,33 @@ public class IndexModel : PageModel
 {
     private readonly ITranslator _translator;
 
-    public List<SelectListItem>? SourceOptions { get; set; }
-    public List<SelectListItem>? TargetOptions { get; set; }
+    public IEnumerable<SelectListItem> SourceOptions { get; set; }
+    public IEnumerable<SelectListItem> TargetOptions { get; set; }
 
-    public string SourceLanguage { get; set; } = "en";
-    public string TargetLanguage { get; set; } = "es";
-    public string SourceText { get; set; } = string.Empty;
-    public string TargetText { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
+    public string SourceId { get; set; } = string.Empty;
+    public string TargetId { get; set; } = string.Empty;
+    public string Translation { get; set; } = string.Empty;
 
     public IndexModel(ITranslator translator)
     {
         _translator = translator;
-        SetOptions();
+        SourceOptions = MapLanguageToSelectListItem(_translator.SourceLanguages);
+        TargetOptions = MapLanguageToSelectListItem(_translator.TargetLanguages);
     }
 
-    public void OnGet()
-    {
-
-    }
+    public void OnGet() { }
 
     public void OnPost()
     {
-        if (!string.IsNullOrEmpty(SourceText) && SourceLanguage != TargetLanguage)
-        {
-            var translation = _translator.Translate(new Translation
-            {
-                SourceLanguage = _translator.Languages.First(l => l.Id == SourceLanguage),
-                TargetLanguage = _translator.Languages.First(l => l.Id == TargetLanguage),
-                SourceText = SourceText
-            });
+        Translation = _translator.Translate(Text, SourceId, TargetId);
 
-            TargetText = translation.TargetText;
-        }
-        else
-        {
-            TargetText = SourceText;
-        }
-
-        SetOptions();
+        SourceOptions = MapLanguageToSelectListItem(_translator.SourceLanguages);
+        TargetOptions = MapLanguageToSelectListItem(_translator.TargetLanguages);
     }
 
-    public void SetOptions()
+    private static IEnumerable<SelectListItem> MapLanguageToSelectListItem(IEnumerable<Language> languages)
     {
-        SourceOptions = (from l in _translator.Languages
-                         where l.SupportedAsSource == true
-                         orderby l.Name
-                         select new SelectListItem { Value = l.Id, Text = l.Name }).ToList();
-
-        TargetOptions = (from l in _translator.Languages
-                         where l.SupportedAsTarget == true
-                         orderby l.Name
-                         select new SelectListItem { Value = l.Id, Text = l.Name }).ToList();
+        return languages.Select(l => new SelectListItem { Value = l.Id, Text = l.Name }).ToList();
     }
 }

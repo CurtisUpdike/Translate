@@ -3,23 +3,23 @@
 
 <form class="grid" method="post">
     <div>
-        <select asp-for="SourceLanguage" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
+        <select asp-for="SourceId" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
         </select>
-        <textarea asp-for="SourceText" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
+        <textarea asp-for="Text" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
         <div id="sourceControls">
             <button>Translate</button>
         </div>
     </div>
     <div>
-        <select asp-for="TargetLanguage" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">
+        <select asp-for="TargetId" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">
 
         </select>
-        <textarea cols="80" rows="10" placeholder="Translation" readonly>@Model.TargetText</textarea>
+        <textarea cols="80" rows="10" placeholder="Translation" readonly>@Model.Translation</textarea>
     </div>
 </form>
 
 <script>
-    const sourceText = document.getElementById('SourceText');
+    const sourceText = document.getElementById('Text');
     const sourceControls = document.getElementById('sourceControls');
 
     const characterLimit = document.createElement('span');
