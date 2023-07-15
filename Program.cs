@@ -2,7 +2,6 @@ using Translate.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<ITranslator, Translator>();
 
@@ -23,6 +22,20 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapPost("/translate", GetTranslation);
+
 app.MapRazorPages();
 
 app.Run();
+
+static string GetTranslation(ITranslator translator, RequestBody body)
+{
+    string translation = translator.Translate(body.Text, body.SourceId, body.TargetId);
+
+    return translation;
+}
+
+public record RequestBody(
+    string SourceId,
+    string TargetId,
+    string Text);
