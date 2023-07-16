@@ -8,7 +8,8 @@ public class Translator : ITranslator
 {
     private LanguageTranslatorService _translator;
 
-    public List<Language> Languages { get; private init; }
+    public IEnumerable<Language> SourceLanguages { get; private init; }
+    public IEnumerable<Language> TargetLanguages { get; private init; }
 
     public Translator(IConfiguration config)
     {
@@ -20,27 +21,39 @@ public class Translator : ITranslator
         _translator.SetServiceUrl(config["Translator:Url"]);
         _translator.WithHeader("X-Watson-Learning-Opt-Out", "true");
 
-        Languages = _translator.ListLanguages().Result._Languages.Select(l =>
-            new Language
-            {
-                Id = l._Language.ToString(),
-                Name = l.LanguageName,
-                SupportedAsSource = l.SupportedAsSource == true,
-                SupportedAsTarget = l.SupportedAsTarget == true,
-            }
-        ).ToList();
-    }   
+        var languages = _translator.ListLanguages().Result._Languages;
 
-    public Translation Translate(Translation translation)
+        SourceLanguages = languages.Where(l => l.SupportedAsSource == true)
+                                   .Select(MapToLanguageModel)
+                                   .ToList();
+
+        TargetLanguages = languages.Where(l => l.SupportedAsTarget == true)
+                                   .Select(MapToLanguageModel)
+                                   .ToList();
+    }
+
+    public string Translate(string text, string sourceId, string targetId)
     {
+        if (string.IsNullOrWhiteSpace(text) || string.IsNullOrEmpty(sourceId) || string.IsNullOrEmpty(targetId))
+        {
+            return string.Empty;
+        }
+
+        if (sourceId == targetId)
+        {
+            return text;
+        }
+
         var result = _translator.Translate(
-            text: new List<string>() { translation.SourceText },
-            source: translation.SourceLanguage.Id,
-            target: translation.TargetLanguage.Id
-        );
+            text: new() { text },
+            source: sourceId,
+            target: targetId);
 
-        translation.TargetText = result.Result.Translations[0]._Translation;
+        return result.Result.Translations[0]._Translation;
+    }
 
-        return translation;
+    private static Language MapToLanguageModel(IBM.Watson.LanguageTranslator.v3.Model.Language language)
+    {
+        return new Language(Id: language._Language.ToString(), Name: language.LanguageName);
     }
 }

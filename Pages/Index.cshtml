@@ -3,33 +3,18 @@
 
 <form class="grid" method="post">
     <div>
-        <select asp-for="SourceLanguage" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
+        <select asp-for="SourceId" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
+            <option value="">-- Select Language --</option>
         </select>
-        <textarea asp-for="SourceText" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
+        <textarea asp-for="Text" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
         <div id="sourceControls">
             <button>Translate</button>
         </div>
     </div>
     <div>
-        <select asp-for="TargetLanguage" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">
-
+        <select asp-for="TargetId" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">
+            <option value="">-- Select Language --</option>
         </select>
-        <textarea cols="80" rows="10" placeholder="Translation" readonly>@Model.TargetText</textarea>
+        <textarea id="translation" cols="80" rows="10" placeholder="Translation" readonly>@Model.Translation</textarea>
     </div>
 </form>
-
-<script>
-    const sourceText = document.getElementById('SourceText');
-    const sourceControls = document.getElementById('sourceControls');
-
-    const characterLimit = document.createElement('span');
-    characterLimit.id = 'characterLimit';
-    characterLimit.textContent = `${sourceText.value.length}/10000`;
-    sourceControls.append(characterLimit);
-
-    sourceText.addEventListener('input', handleTextChange);
-
-    function handleTextChange() {
-        characterLimit.textContent = `${sourceText.value.length}/10000`;
-    }
-</script>
