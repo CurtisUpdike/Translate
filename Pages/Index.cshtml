@@ -4,6 +4,7 @@
 <form class="grid" method="post">
     <div>
         <select asp-for="SourceId" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
+            <option value="">-- Select Language --</option>
         </select>
         <textarea asp-for="Text" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
         <div id="sourceControls">
@@ -12,7 +13,7 @@
     </div>
     <div>
         <select asp-for="TargetId" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">
-
+            <option value="">-- Select Language --</option>
         </select>
         <textarea id="translation" cols="80" rows="10" placeholder="Translation" readonly>@Model.Translation</textarea>
     </div>
@@ -44,7 +45,9 @@
     }
 
     async function translate() {
-        if (sourceId.value === targetId.value) {
+        if (sourceId.value === "" || targetId.value === "") {
+            return;
+        } else if (sourceId.value === targetId.value) {
             translation.value = text.value;
         } else if (text === "") {
             translation.value = "";
@@ -61,7 +64,8 @@
         };
 
         const response = await fetch('/translate', request);
-        return await response.text();
+        const body = await response.json();
+        return body.translation;
     }
 
     function debounce(callback, delay = 500) {

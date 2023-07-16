@@ -34,7 +34,7 @@ public class Translator : ITranslator
 
     public string Translate(string text, string sourceId, string targetId)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(text) || string.IsNullOrEmpty(sourceId) || string.IsNullOrEmpty(targetId))
         {
             return string.Empty;
         }
