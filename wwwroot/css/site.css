@@ -57,8 +57,9 @@ body {
     transition: none;
 }
 
-select:focus {
-    box-shadow: 0 0 0 2px #fff;
+.form-select:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px #fff;
 }
 
 textarea {

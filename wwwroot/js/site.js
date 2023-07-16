@@ -1,4 +1,13 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿const sourceText = document.getElementById('SourceText');
+const sourceControls = document.getElementById('sourceControls');
 
-// Write your JavaScript code.
+const characterLimit = document.createElement('span');
+characterLimit.id = 'characterLimit';
+characterLimit.textContent = `${sourceText.value.length}/10000`;
+sourceControls.append(characterLimit);
+
+sourceText.addEventListener('input', handleTextChange);
+
+function handleTextChange() {
+    characterLimit.textContent = `${sourceText.value.length}/10000`;
+}
