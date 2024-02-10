@@ -1,43 +1,75 @@
-let { createElement: e, StrictMode } = React;
+let { 
+  createElement: e, 
+  StrictMode,
+  useState
+} = React;
 let { createRoot } = ReactDOM;
 
 
-createRoot(document.getElementById('root'))
-  .render(withStrictMode(App));
+document.addEventListener('DOMContentLoaded', main);
+
+function main() {
+  createRoot(document.getElementById('root'))
+    .render(withStrictMode(App));
+}
+
+
+// type Language = { language: string; name: string; }
 
 
 function App() {
+  let [allSourceLanguages] = useState([
+    { language: 'detect', name: 'Detect Language'},
+    { language: 'en', name: 'English'},
+    { language: 'es', name: 'Spanish' }
+  ]);
+
+  let [allTargetLanguages] = useState([
+    { language: 'en', name: 'English'},
+    { language: 'es', name: 'Spanish' }
+  ]);
+
+  let [sourceLanguage, setSourceLanguage] = useState({ language: 'detect', name: 'Detect Language'});
+  let [targetLanguage, setTargetLanguage] = useState(null);
+
   return (
     e('div', { className: 'text-translation' },
-      e(TranslationInput),
-      e(TranslationOutput)
+      e(TranslationInput, { allSourceLanguages, sourceLanguage, setSourceLanguage }),
+      e(TranslationOutput, { allTargetLanguages, targetLanguage, setTargetLanguage })
     )
   );
 }
 
 
-function TranslationInput() {
+function TranslationInput(props) {
   return (
-    e('div', { className: 'text-input' },
+    e('div', { className: 'form' },
       e('div', { className: 'character-limit' }, '0/10000'),
       e('div', { className: 'detected-language-container'}, 'English'),
-      e(LanguageDropdown),
-      e(TextArea)
+      e(LanguageDropdown, { 
+        languages: props.allSourceLanguages, 
+        selectedLanguage: props.sourceLanguage,
+        select: props.setSourceLanguage
+      }),
+      e(TextArea, { placeholder: 'Enter text' })
     )
   );
 }
 
 
-function TranslationOutput() {
+function TranslationOutput(props) {
   return (
-    e('div', { className: 'text-input' },
-      e(LanguageDropdown),
+    e('div', { className: 'form' },
+      e(LanguageDropdown, { 
+        languages: props.allTargetLanguages,
+        selectedLanguage: props.targetLanguage,
+        select: props.setTargetLanguage
+      }),
       e(
-        'div', 
+        'div',
         { className: 'copy-container'}, 
-        null, 
         e(CopyIcon),
-        e('div', { className: 'tooltiptext' }, "Copied!")
+        e('div', { className: 'tooltiptext' }, 'Copied!')
       ),
       e(TextArea)
     )
@@ -45,22 +77,39 @@ function TranslationOutput() {
 }
 
 
-function LanguageDropdown() {
+function LanguageDropdown(props) {
+  let [isOpen, setIsOpen] = useState(false);
+
+  function toggleOpen() {
+    setIsOpen(state => !state);
+  }
+
+  let languageOptions = props.languages.map(({ language, name }) => 
+    e(
+      'div', 
+      { className: 'option', onClick: () => props.select({ language, name }) }, 
+      name, 
+      e(CheckIcon, { isSelected: (language === props.selectedLanguage?.language) }))
+  );
+
   return (
     e('div', { className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, 
-      e('div', { className: 'selected-item option'}, "Language", e(OpenCloseArrowIcon)),
-      e('div', { className: 'dropdown-content' },
+      e('div', { className: 'selected-item option', onClick: toggleOpen }, 
+        props.selectedLanguage?.name || 'Select', 
+        e(OpenCloseArrowIcon, { isOpen })
+      ),
+      e('div', { className: `dropdown-content ${isOpen ? 'active' : ''}` },
         e('div', { className: 'search-bar' },
-          e('div', { className: 'bx--form-item bx--text-input-wrapper' },
-            e('div', { className: 'bx--text-input__field-wrapper' }, 
-              e('input', { className: 'bx--text-input bx--text__input', placeholder: 'Search...', type: 'text' })
+          e('div', { className: 'form-item' },
+            e('div', { className: 'text-input-wrapper' }, 
+              e('input', { className: 'text-input', placeholder: 'Search...', type: 'text' })
             )
           ),
-          e(SearchIcon)
+          e(ClearSearchIcon)
         ),
         e('div', { className: 'columns' },
           e('div', { className: 'column', style: { width: '25%' } },
-            e('div', { className: 'option' }, 'Language', e(CheckIcon))
+            ...languageOptions
           ),
           e('div', { className: 'column', style: { width: '25%' } }),
           e('div', { className: 'column', style: { width: '25%' } }),
@@ -74,56 +123,62 @@ function LanguageDropdown() {
 
 function TextArea() {
   return (
-    e('div', { className: 'bx--form-item'}, 
-      e('div', { className: 'bx--text-area__wrapper' }, 
-        e('textarea', { className: 'bx--text-area text-area', rows: '10' })
+    e('div', { className: 'form-item'}, 
+      e('div', { className: 'text-area-wrapper' }, 
+        e('textarea', { className: 'text-area', rows: '10' })
       )
     )
   );
 }
 
 
-function OpenCloseArrowIcon() {
-  return e('div', { className: 'icon open-close-arrow' },
-    e('svg', { ...sharedSvgAttributes, viewBox: "0 0 16 16" }, 
+let OpenCloseArrowIcon = ({ isOpen }) => (
+  e('div', { className: `icon open-close-arrow ${isOpen ? 'active' : ''}` },
+    e('svg', { ...svgAttributes, viewBox: '0 0 16 16' }, 
       e('path', { d: 'M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z'})
     )
-  );
-}
+  )
+);
 
 
-function SearchIcon() {
-  return e('svg', { ...sharedSvgAttributes, viewBox: "0 0 16 16" },
+let ClearSearchIcon = () => (
+  e('svg', { ...svgAttributes, className: 'icon clear-icon', viewBox: '0 0 16 16' },
     e('path', { d: 'M8,1C4.1,1,1,4.1,1,8s3.1,7,7,7s7-3.1,7-7S11.9,1,8,1z M10.7,11.5L8,8.8l-2.7,2.7l-0.8-0.8L7.2,8L4.5,5.3l0.8-0.8L8,7.2	l2.7-2.7l0.8,0.8L8.8,8l2.7,2.7L10.7,11.5z' })
-  );
-}
+  )
+);
 
 
-function CheckIcon() {
-  return e('svg', { ...sharedSvgAttributes, viewBox: "0 0 32 32" },
+let CheckIcon = ({ isSelected }) => (
+  e(
+    'svg', 
+    { 
+      ...svgAttributes, 
+      className: `icon check-icon ${isSelected ? 'active' : ''}`, 
+      viewBox: '0 0 32 32' 
+    },
     e('path', { d: 'M12 21.2L4.9 14.1 3.5 15.5 10.6 22.6 12 24 26.1 9.9 24.7 8.4z' })
-  );
-}
+  )
+);
 
 
-function CopyIcon() {
-  return e('svg', { ...sharedSvgAttributes, viewBox: "0 0 32 32" },
+let CopyIcon = () => (
+  e('svg', { ...svgAttributes, viewBox: '0 0 32 32' },
     e('path', { d: 'M28,10V28H10V10H28m0-2H10a2,2,0,0,0-2,2V28a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2Z' }),
     e('path', { d: 'M4,18H2V4A2,2,0,0,1,4,2H18V4H4Z' })
-  );
-}
+  )
+);
 
 
-const sharedSvgAttributes = {
-  focusable: "false", 
-  preserveAspectRatio: "xMidYMid meet",
-  fill: "#ffffff",
-  xmlns: "http://www.w3.org/2000/svg",
-  width: "16",
-  height: "16",
-  'aria-hidden': "true",
+let svgAttributes = {
+  focusable: 'false', 
+  preserveAspectRatio: 'xMidYMid meet',
+  fill: '#ffffff',
+  xmlns: 'http://www.w3.org/2000/svg',
+  width: '16',
+  height: '16',
+  'aria-hidden': 'true',
   style: { willChange: 'transform' }
-}
+};
 
 
 function withStrictMode(app) {
