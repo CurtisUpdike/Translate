@@ -78,35 +78,41 @@ function TranslationOutput(props) {
 
 
 function LanguageDropdown(props) {
-  let [isOpen, setIsOpen] = useState(false);
+  let { languages, selectedLanguage, select } = props;
+  let [active, setActive] = useState(false);
+  let [search, setSearch] = useState('');
 
-  function toggleOpen() {
-    setIsOpen(state => !state);
-  }
 
-  let languageOptions = props.languages.map(({ language, name }) => 
-    e(
-      'div', 
-      { className: 'option', onClick: () => props.select({ language, name }) }, 
-      name, 
-      e(CheckIcon, { isSelected: (language === props.selectedLanguage?.language) }))
+  let toggleOpen = () => setActive(state => !state);
+  let handleSearch = (e) => setSearch(e.target.value);
+
+  let option = ({ language, name }) => e(
+    'div', 
+    { className: 'option', onClick: () => select({ language, name }) }, 
+    name, 
+    e(CheckIcon, { isSelected: (language === selectedLanguage?.language) })
   );
+
+  let searchInput = e('div', { className: 'search-bar' },
+    e('div', { className: 'form-item' },
+      e('div', { className: 'text-input-wrapper' }, 
+        e('input', { className: 'text-input', placeholder: 'Search...', type: 'text', onChange: handleSearch })
+      )
+    ),
+    e(ClearSearchIcon)
+  );
+
+  let searchFilter = (l) => l.name.toUpperCase().includes(search.toUpperCase());
+  let languageOptions = languages.filter(searchFilter).map(option);
 
   return (
     e('div', { className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, 
       e('div', { className: 'selected-item option', onClick: toggleOpen }, 
-        props.selectedLanguage?.name || 'Select', 
-        e(OpenCloseArrowIcon, { isOpen })
+        selectedLanguage?.name || 'Select', 
+        e(OpenCloseArrowIcon, { active })
       ),
-      e('div', { className: `dropdown-content ${isOpen ? 'active' : ''}` },
-        e('div', { className: 'search-bar' },
-          e('div', { className: 'form-item' },
-            e('div', { className: 'text-input-wrapper' }, 
-              e('input', { className: 'text-input', placeholder: 'Search...', type: 'text' })
-            )
-          ),
-          e(ClearSearchIcon)
-        ),
+      e('div', { className: `dropdown-content ${active ? 'active' : ''}` },
+        searchInput,
         e('div', { className: 'columns' },
           e('div', { className: 'column', style: { width: '25%' } },
             ...languageOptions
