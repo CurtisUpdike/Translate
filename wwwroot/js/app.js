@@ -1,8 +1,9 @@
 let { 
-  createElement: e, 
+  createElement, 
   StrictMode,
   useState
 } = React;
+let e = createElement;
 let { createRoot } = ReactDOM;
 
 
@@ -34,28 +35,34 @@ function App() {
 
   return (
     e('div', { className: 'text-translation' },
-      e(TranslationInput, { allSourceLanguages, sourceLanguage, setSourceLanguage }),
+      e(TranslationInput, { allSourceLanguages, sourceLanguage, setSourceLanguage, targetLanguage }),
       e(TranslationOutput, { allTargetLanguages, targetLanguage, setTargetLanguage })
     )
   );
 }
 
 
-function TranslationInput(props) {
+function TranslationInput({ allSourceLanguages, sourceLanguage, setSourceLanguage, targetLanguage }) {
   let [characterCount, setCharacterCount] = useState(0);
 
   function handleInput(e) {
-    setCharacterCount(e.target.value.length)
+    setCharacterCount(e.target.value.length);
+    translate(e.target.value);
+  }
+
+  async function translate(text) {
+    let translation = await fetchTranslation(text, sourceLanguage?.language, targetLanguage?.language);
+    console.log(translation);
   }
   
   return (
     e('div', { className: 'form' },
-      e('div', { className: 'character-limit' }, `${characterCount}/10000`),
+      createCharacterLimit(characterCount),
       e('div', { className: 'detected-language-container'}, 'English'),
       e(LanguageDropdown, { 
-        languages: props.allSourceLanguages, 
-        selectedLanguage: props.sourceLanguage,
-        select: props.setSourceLanguage
+        languages: allSourceLanguages, 
+        selectedLanguage: sourceLanguage,
+        select: setSourceLanguage
       }),
       e(TextArea, { placeholder: 'Enter text', onChange: handleInput })
     )
@@ -144,6 +151,10 @@ function TextArea(props) {
 }
 
 
+let createCharacterLimit = (c) => 
+  createElement('div', { className: 'character-limit' }, `${c}/10000`);
+
+
 let OpenCloseArrowIcon = ({ isOpen }) => (
   e('div', { className: `icon open-close-arrow ${isOpen ? 'active' : ''}` },
     e('svg', { ...svgAttributes, viewBox: '0 0 16 16' }, 
@@ -195,4 +206,23 @@ let svgAttributes = {
 
 function withStrictMode(app) {
   return e(StrictMode, null, e(app));
+}
+
+
+async function fetchTranslation(text, source, target) {
+  if (!source || !target || !text)
+    return '';
+
+  if (source === target)
+    return text;
+
+  let request = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Text: text, SourceId: source, TargetId: target })
+  };
+
+  let response = await fetch('/translate', request);
+  let body = await response.json();
+  return body.translation;
 }
