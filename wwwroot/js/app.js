@@ -42,16 +42,22 @@ function App() {
 
 
 function TranslationInput(props) {
+  let [characterCount, setCharacterCount] = useState(0);
+
+  function handleInput(e) {
+    setCharacterCount(e.target.value.length)
+  }
+  
   return (
     e('div', { className: 'form' },
-      e('div', { className: 'character-limit' }, '0/10000'),
+      e('div', { className: 'character-limit' }, `${characterCount}/10000`),
       e('div', { className: 'detected-language-container'}, 'English'),
       e(LanguageDropdown, { 
         languages: props.allSourceLanguages, 
         selectedLanguage: props.sourceLanguage,
         select: props.setSourceLanguage
       }),
-      e(TextArea, { placeholder: 'Enter text' })
+      e(TextArea, { placeholder: 'Enter text', onChange: handleInput })
     )
   );
 }
@@ -71,7 +77,7 @@ function TranslationOutput(props) {
         e(CopyIcon),
         e('div', { className: 'tooltiptext' }, 'Copied!')
       ),
-      e(TextArea)
+      e(TextArea, { placeholder: 'Translation' })
     )
   );
 }
@@ -127,11 +133,11 @@ function LanguageDropdown(props) {
 }
 
 
-function TextArea() {
+function TextArea(props) {
   return (
     e('div', { className: 'form-item'}, 
       e('div', { className: 'text-area-wrapper' }, 
-        e('textarea', { className: 'text-area', rows: '10' })
+        e('textarea', { className: 'text-area', rows: '10', ...props })
       )
     )
   );
