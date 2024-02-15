@@ -19,30 +19,31 @@ function main() {
 
 
 function App() {
-  let [allSourceLanguages] = useState([
+  let [allSources] = useState([
     { language: 'detect', name: 'Detect Language'},
     { language: 'en', name: 'English'},
     { language: 'es', name: 'Spanish' }
   ]);
 
-  let [allTargetLanguages] = useState([
+  let [allTargets] = useState([
     { language: 'en', name: 'English'},
     { language: 'es', name: 'Spanish' }
   ]);
 
-  let [sourceLanguage, setSourceLanguage] = useState({ language: 'detect', name: 'Detect Language'});
-  let [targetLanguage, setTargetLanguage] = useState(null);
+  let [source, setSource] = useState({ language: 'detect', name: 'Detect Language'});
+  let [target, setTarget] = useState(null);
+  let [translation, setTranslation] = useState('');
 
   return (
     e('div', { className: 'text-translation' },
-      e(TranslationInput, { allSourceLanguages, sourceLanguage, setSourceLanguage, targetLanguage }),
-      e(TranslationOutput, { allTargetLanguages, targetLanguage, setTargetLanguage })
+      e(TranslationInput, { allSources, source, setSource, target, setTranslation }),
+      e(TranslationOutput, { allTargets, target, setTarget, translation })
     )
   );
 }
 
 
-function TranslationInput({ allSourceLanguages, sourceLanguage, setSourceLanguage, targetLanguage }) {
+function TranslationInput({ allSources, source, setSource, target, setTranslation }) {
   let [characterCount, setCharacterCount] = useState(0);
 
   function handleInput(e) {
@@ -51,8 +52,7 @@ function TranslationInput({ allSourceLanguages, sourceLanguage, setSourceLanguag
   }
 
   async function translate(text) {
-    let translation = await fetchTranslation(text, sourceLanguage?.language, targetLanguage?.language);
-    console.log(translation);
+    setTranslation(await fetchTranslation(text, source?.language, target?.language));
   }
   
   return (
@@ -60,9 +60,9 @@ function TranslationInput({ allSourceLanguages, sourceLanguage, setSourceLanguag
       createCharacterLimit(characterCount),
       e('div', { className: 'detected-language-container'}, 'English'),
       e(LanguageDropdown, { 
-        languages: allSourceLanguages, 
-        selectedLanguage: sourceLanguage,
-        select: setSourceLanguage
+        languages: allSources, 
+        selectedLanguage: source,
+        select: setSource
       }),
       e(TextArea, { placeholder: 'Enter text', onChange: handleInput })
     )
@@ -70,13 +70,13 @@ function TranslationInput({ allSourceLanguages, sourceLanguage, setSourceLanguag
 }
 
 
-function TranslationOutput(props) {
+function TranslationOutput({ target, setTarget, allTargets, translation }) {
   return (
     e('div', { className: 'form' },
       e(LanguageDropdown, { 
-        languages: props.allTargetLanguages,
-        selectedLanguage: props.targetLanguage,
-        select: props.setTargetLanguage
+        languages: allTargets,
+        selectedLanguage: target,
+        select: setTarget
       }),
       e(
         'div',
@@ -84,7 +84,7 @@ function TranslationOutput(props) {
         e(CopyIcon),
         e('div', { className: 'tooltiptext' }, 'Copied!')
       ),
-      e(TextArea, { placeholder: 'Translation' })
+      e(TextArea, { placeholder: 'Translation', value: translation, readOnly: true, className: 'translation-output' })
     )
   );
 }
@@ -140,19 +140,56 @@ function LanguageDropdown(props) {
 }
 
 
-function TextArea(props) {
+function TextArea({ className = '', ...props }) {
   return (
     e('div', { className: 'form-item'}, 
       e('div', { className: 'text-area-wrapper' }, 
-        e('textarea', { className: 'text-area', rows: '10', ...props })
+        e('textarea', { className: `text-area ${className}`, rows: '10', ...props })
       )
     )
   );
 }
 
 
+let withStrictMode = (app) => createElement(StrictMode, null, createElement(app));
+
 let createCharacterLimit = (c) => 
   createElement('div', { className: 'character-limit' }, `${c}/10000`);
+
+
+async function fetchTranslation(text, source, target) {
+  if (!source || !target || !text)
+    return '';
+
+  if (source === target)
+    return text;
+
+  let request = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Text: text, SourceId: source, TargetId: target })
+  };
+
+  let response = await fetch('/translate', request);
+  let body = await response.json();
+  return body.translation;
+}
+
+
+/*
+** Icons
+*/
+
+let svgAttributes = {
+  focusable: 'false', 
+  preserveAspectRatio: 'xMidYMid meet',
+  fill: '#ffffff',
+  xmlns: 'http://www.w3.org/2000/svg',
+  width: '16',
+  height: '16',
+  'aria-hidden': 'true',
+  style: { willChange: 'transform' }
+};
 
 
 let OpenCloseArrowIcon = ({ isOpen }) => (
@@ -190,39 +227,3 @@ let CopyIcon = () => (
     e('path', { d: 'M4,18H2V4A2,2,0,0,1,4,2H18V4H4Z' })
   )
 );
-
-
-let svgAttributes = {
-  focusable: 'false', 
-  preserveAspectRatio: 'xMidYMid meet',
-  fill: '#ffffff',
-  xmlns: 'http://www.w3.org/2000/svg',
-  width: '16',
-  height: '16',
-  'aria-hidden': 'true',
-  style: { willChange: 'transform' }
-};
-
-
-function withStrictMode(app) {
-  return e(StrictMode, null, e(app));
-}
-
-
-async function fetchTranslation(text, source, target) {
-  if (!source || !target || !text)
-    return '';
-
-  if (source === target)
-    return text;
-
-  let request = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ Text: text, SourceId: source, TargetId: target })
-  };
-
-  let response = await fetch('/translate', request);
-  let body = await response.json();
-  return body.translation;
-}
