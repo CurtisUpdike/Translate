@@ -59,9 +59,9 @@ function TranslationInput({ allSources, source, setSource, target, setTranslatio
     e('div', { className: 'form' },
       createCharacterLimit(characterCount),
       e('div', { className: 'detected-language-container'}, 'English'),
-      e(LanguageDropdown, { 
+      e(Dropdown, { 
         languages: allSources, 
-        selectedLanguage: source,
+        selected: source,
         select: setSource
       }),
       e(TextArea, { placeholder: 'Enter text', onChange: handleInput })
@@ -72,10 +72,10 @@ function TranslationInput({ allSources, source, setSource, target, setTranslatio
 
 function TranslationOutput({ target, setTarget, allTargets, translation }) {
   return (
-    e('div', { className: 'form' },
-      e(LanguageDropdown, { 
+    e('div', { className: 'form translation-output' },
+      e(Dropdown, { 
         languages: allTargets,
-        selectedLanguage: target,
+        selected: target,
         select: setTarget
       }),
       e(
@@ -84,14 +84,14 @@ function TranslationOutput({ target, setTarget, allTargets, translation }) {
         e(CopyIcon),
         e('div', { className: 'tooltiptext' }, 'Copied!')
       ),
-      e(TextArea, { placeholder: 'Translation', value: translation, readOnly: true, className: 'translation-output' })
+      e(TextArea, { placeholder: 'Translation', value: translation, readOnly: true })
     )
   );
 }
 
 
-function LanguageDropdown(props) {
-  let { languages, selectedLanguage, select } = props;
+function Dropdown(props) {
+  let { languages, selected, select } = props;
   let [active, setActive] = useState(false);
   let [search, setSearch] = useState('');
 
@@ -99,29 +99,39 @@ function LanguageDropdown(props) {
   let toggleOpen = () => setActive(state => !state);
   let handleSearch = (e) => setSearch(e.target.value);
 
-  let option = ({ language, name }) => e(
-    'div', 
-    { className: 'option', onClick: () => select({ language, name }) }, 
-    name, 
-    e(CheckIcon, { isSelected: (language === selectedLanguage?.language) })
-  );
+  let createOption = ({ language, name }) => 
+    createElement(
+      'div',
+      {
+        className: 'option',
+        onClick: () => select({ language, name })
+      },
+      name,
+      createElement(CheckIcon, { isSelected: (language === selected?.language) })
+    );
 
   let searchInput = e('div', { className: 'search-bar' },
-    e('div', { className: 'form-item' },
-      e('div', { className: 'text-input-wrapper' }, 
-        e('input', { className: 'text-input', placeholder: 'Search...', type: 'text', onChange: handleSearch })
+    createTextInputWrapper(
+      createElement(
+        'input',
+        {
+          className: 'text-input',
+          placeholder: 'Search...',
+          type: 'text',
+          onChange: handleSearch
+        }
       )
     ),
     e(ClearSearchIcon)
   );
 
   let searchFilter = (l) => l.name.toUpperCase().includes(search.toUpperCase());
-  let languageOptions = languages.filter(searchFilter).map(option);
+  let languageOptions = languages.filter(searchFilter).map(createOption);
 
   return (
     e('div', { className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, 
       e('div', { className: 'selected-item option', onClick: toggleOpen }, 
-        selectedLanguage?.name || 'Select', 
+        selected?.name || 'Select', 
         e(OpenCloseArrowIcon, { active })
       ),
       e('div', { className: `dropdown-content ${active ? 'active' : ''}` },
@@ -140,21 +150,27 @@ function LanguageDropdown(props) {
 }
 
 
-function TextArea({ className = '', ...props }) {
-  return (
-    e('div', { className: 'form-item'}, 
-      e('div', { className: 'text-area-wrapper' }, 
-        e('textarea', { className: `text-area ${className}`, rows: '10', ...props })
-      )
-    )
-  );
-}
+let TextArea = (props) =>
+  createTextAreaWrapper(
+    createElement('textarea', { className: 'text-area', rows: '10', ...props }));
 
 
-let withStrictMode = (app) => createElement(StrictMode, null, createElement(app));
+let withStrictMode = (app) =>
+  createElement(StrictMode, null, createElement(app));
 
-let createCharacterLimit = (c) => 
+
+let createCharacterLimit = (c) =>
   createElement('div', { className: 'character-limit' }, `${c}/10000`);
+
+
+let createTextInputWrapper = (children) =>
+  createElement('div', { className: 'form-item' },
+    createElement('div', { className: 'text-input-wrapper' }, children));
+
+
+let createTextAreaWrapper = (children) =>
+  createElement('div', { className: 'form-item'}, 
+    createElement('div', { className: 'text-area-wrapper' }, children));
 
 
 async function fetchTranslation(text, source, target) {

@@ -321,7 +321,7 @@ body {
   font-size: 20px;
 }
 
-.text-translation .translation-output {
+.translation-output .text-area  {
   cursor: default;
 }
 
