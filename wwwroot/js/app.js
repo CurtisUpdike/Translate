@@ -1,7 +1,9 @@
 let { 
   createElement, 
   StrictMode,
-  useState
+  useState,
+  useEffect,
+  useRef
 } = React;
 let e = createElement;
 let { createRoot } = ReactDOM;
@@ -94,10 +96,22 @@ function Dropdown(props) {
   let { languages, selected, select } = props;
   let [active, setActive] = useState(false);
   let [search, setSearch] = useState('');
+  let selectRef = useRef();
+  let searcRef = useRef();
 
+  useEffect(() => {
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
 
-  let toggleOpen = () => setActive(state => !state);
-  let handleSearch = (e) => setSearch(e.target.value);
+    function handler(event) {
+      if (selectRef.current.contains(event.target))
+        setActive(state => !state);
+      else if (searcRef.current.contains(event.target))
+       return;
+      else
+        setActive(false);
+    }
+  });
 
   let createOption = ({ language, name }) => 
     createElement(
@@ -110,7 +124,8 @@ function Dropdown(props) {
       createElement(CheckIcon, { isSelected: (language === selected?.language) })
     );
 
-  let searchInput = e('div', { className: 'search-bar' },
+  let handleSearch = (e) => setSearch(e.target.value);
+  let searchInput = e('div', { className: 'search-bar', ref: searcRef },
     createTextInputWrapper(
       createElement(
         'input',
@@ -130,7 +145,7 @@ function Dropdown(props) {
 
   return (
     e('div', { className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, 
-      e('div', { className: 'selected-item option', onClick: toggleOpen }, 
+      e('div', { className: 'selected-item option', ref: selectRef }, 
         selected?.name || 'Select', 
         e(OpenCloseArrowIcon, { active })
       ),
@@ -155,22 +170,24 @@ let TextArea = (props) =>
     createElement('textarea', { className: 'text-area', rows: '10', ...props }));
 
 
-let withStrictMode = (app) =>
-  createElement(StrictMode, null, createElement(app));
+let withStrictMode = (element) =>
+  createElement(StrictMode, null, createElement(element));
 
 
-let createCharacterLimit = (c) =>
-  createElement('div', { className: 'character-limit' }, `${c}/10000`);
+let createCharacterLimit = (count) =>
+  createElement('div', { className: 'character-limit' }, `${count}/10000`);
 
+let createDrowpdownWrapper = (...children) => 
+    createElement('div', { className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, ...children)
 
-let createTextInputWrapper = (children) =>
+let createTextInputWrapper = (...children) =>
   createElement('div', { className: 'form-item' },
-    createElement('div', { className: 'text-input-wrapper' }, children));
+    createElement('div', { className: 'text-input-wrapper' }, ...children));
 
 
-let createTextAreaWrapper = (children) =>
+let createTextAreaWrapper = (...children) =>
   createElement('div', { className: 'form-item'}, 
-    createElement('div', { className: 'text-area-wrapper' }, children));
+    createElement('div', { className: 'text-area-wrapper' }, ...children));
 
 
 async function fetchTranslation(text, source, target) {
@@ -218,7 +235,7 @@ let OpenCloseArrowIcon = ({ isOpen }) => (
 
 
 let ClearSearchIcon = () => (
-  e('svg', { ...svgAttributes, className: 'icon clear-icon', viewBox: '0 0 16 16' },
+  e('svg', { ...svgAttributes, className: 'icon clear-icon', viewBox: '0 0 16 16'},
     e('path', { d: 'M8,1C4.1,1,1,4.1,1,8s3.1,7,7,7s7-3.1,7-7S11.9,1,8,1z M10.7,11.5L8,8.8l-2.7,2.7l-0.8-0.8L7.2,8L4.5,5.3l0.8-0.8L8,7.2	l2.7-2.7l0.8,0.8L8.8,8l2.7,2.7L10.7,11.5z' })
   )
 );
