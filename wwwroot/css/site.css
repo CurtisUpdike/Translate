@@ -321,6 +321,10 @@ body {
   font-size: 20px;
 }
 
+.text-translation .text-area::placeholder {
+  font-size: 14px;
+}
+
 .translation-output .text-area  {
   cursor: default;
 }
