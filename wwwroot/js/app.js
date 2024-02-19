@@ -15,21 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function App() {
-  let [allSources] = useState([
-    { id: 'detect', name: 'Detect Language'},
-    { id: 'en', name: 'English'},
-    { id: 'es', name: 'Spanish' }
-  ]);
-
-  let [allTargets] = useState([
-    { id: 'en', name: 'English'},
-    { id: 'es', name: 'Spanish' }
-  ]);
-
-  let [source, setSource] = useState({ id: 'detect', name: 'Detect Language'});
+  let [allSources, setAllSources] = useState([]);
+  let [allTargets, setAllTargets] = useState([]);
+  let detect = { id: 'detect', name: 'Detect Language'};
+  let [source, setSource] = useState(detect);
   let [target, setTarget] = useState(null);
   let [translation, setTranslation] = useState('');
   let [characterCount, setCharacterCount] = useState(0);
+
+  useEffect(() => {
+    fetch('/languages')
+      .then(response => response.json())
+      .then(languages => {
+        setAllSources([detect, ...languages.filter(l => l.supportedAsSource)]);
+        setAllTargets(languages.filter(l => l.supportedAsTarget));
+      });
+  }, []);
 
   function handleInput(event) {
     setCharacterCount(event.target.value.length);

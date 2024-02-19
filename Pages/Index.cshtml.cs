@@ -9,7 +9,7 @@ namespace Translate.Pages;
 [BindProperties]
 public class IndexModel : PageModel
 {
-    private readonly ITranslator _translator;
+    private readonly Translator _translator;
 
     public IEnumerable<SelectListItem> SourceOptions { get; set; }
     public IEnumerable<SelectListItem> TargetOptions { get; set; }
@@ -19,7 +19,7 @@ public class IndexModel : PageModel
     public string TargetId { get; set; } = string.Empty;
     public string Translation { get; set; } = string.Empty;
 
-    public IndexModel(ITranslator translator)
+    public IndexModel(Translator translator)
     {
         _translator = translator;
         SourceOptions = MapLanguageToSelectListItem(_translator.SourceLanguages);

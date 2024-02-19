@@ -3,7 +3,7 @@ using Translate.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
-builder.Services.AddSingleton<ITranslator, Translator>();
+builder.Services.AddSingleton<Translator>();
 
 var app = builder.Build();
 
@@ -22,11 +22,22 @@ app.UseAuthorization();
 
 app.MapPost("/translate", GetTranslation);
 
+app.MapGet("/languages", (Translator translator) =>
+{
+    return translator.Languages.Select(l => new
+    {
+        id = l._Language,
+        name = l.LanguageName,
+        supportedAsSource = l.SupportedAsSource,
+        supportedAsTarget = l.SupportedAsTarget
+    });
+});
+
 app.MapRazorPages();
 
 app.Run();
 
-static ResponseBody GetTranslation(ITranslator translator, RequestBody body)
+static ResponseBody GetTranslation(Translator translator, RequestBody body)
 {
     string translation = translator.Translate(body.Text, body.SourceId, body.TargetId);
 
