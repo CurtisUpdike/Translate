@@ -99,12 +99,6 @@ function Dropdown(props) {
 
   let languageOptions = languages.filter(searchFilter).map(createOption);
 
-  let numRows = 15;
-  let columns = [];
-  for (let i = 0; i < languageOptions.length; i += numRows) {
-    columns.push(languageOptions.slice(i, i + numRows));
-  }
-
   return (
     drowpdownWrapper(
       selectedItem({
@@ -117,14 +111,32 @@ function Dropdown(props) {
           ref: searcRef, 
           onChange: (e) => setSearch(e.target.value) 
         }),
-        div({ className: 'columns' },
-          columns.map(row => div({ className: 'column', style: { width: `${100 / columns.length}%` } },
-            ...row
-          ))
-        )
+        options({ items: languageOptions })
       )
     )
   );
+}
+
+
+function Options({ items }) {
+  let numRows = 15;
+  let columns = [];
+
+  for (let i = 0; i < items.length; i += numRows) {
+    columns.push(items.slice(i, i + numRows));
+  }
+
+  let width = (100 / columns.length) + '%';
+  
+  return (
+    div({ className: 'columns' },
+      columns.map((row, index) => 
+        div({ key: index, className: 'column', style: { width } },
+        ...row
+        )
+      )
+    )
+  )
 }
 
 
@@ -220,6 +232,8 @@ let option = ({ onClick, active, name }) =>
     name,
     checkIcon({ active })
   );
+
+let options = (props) => createElement(Options, props);
 
 let copy = () => 
   div({ className: 'copy-container'}, 
