@@ -20,7 +20,11 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapPost("/translate", GetTranslation);
+app.MapPost("/translate", (Translator translator, RequestBody body) =>
+{
+    string translation = translator.Translate(body.Text, body.SourceId, body.TargetId);
+    return new { translation };
+});
 
 app.MapGet("/languages", (Translator translator) =>
 {
@@ -37,17 +41,7 @@ app.MapRazorPages();
 
 app.Run();
 
-static ResponseBody GetTranslation(Translator translator, RequestBody body)
-{
-    string translation = translator.Translate(body.Text, body.SourceId, body.TargetId);
-
-    return new ResponseBody(translation);
-}
-
 public record RequestBody(
     string SourceId,
     string TargetId,
     string Text);
-
-public record ResponseBody(
-    string Translation);

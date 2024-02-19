@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Translate.Services;
-using Translate.Models;
+using IBM.Watson.LanguageTranslator.v3.Model;
 
 namespace Translate.Pages;
 
@@ -22,8 +22,10 @@ public class IndexModel : PageModel
     public IndexModel(Translator translator)
     {
         _translator = translator;
-        SourceOptions = MapLanguageToSelectListItem(_translator.SourceLanguages);
-        TargetOptions = MapLanguageToSelectListItem(_translator.TargetLanguages);
+        SourceOptions = MapLanguageToSelectListItem(_translator.Languages
+            .Where(l => l.SupportedAsSource == true));
+        TargetOptions = MapLanguageToSelectListItem(_translator.Languages
+            .Where(l => l.SupportedAsTarget == true));
     }
 
     public void OnGet() { }
@@ -32,12 +34,14 @@ public class IndexModel : PageModel
     {
         Translation = _translator.Translate(Text, SourceId, TargetId);
 
-        SourceOptions = MapLanguageToSelectListItem(_translator.SourceLanguages);
-        TargetOptions = MapLanguageToSelectListItem(_translator.TargetLanguages);
+        SourceOptions = MapLanguageToSelectListItem(_translator.Languages
+            .Where(l => l.SupportedAsSource == true));
+        TargetOptions = MapLanguageToSelectListItem(_translator.Languages
+            .Where(l => l.SupportedAsTarget == true));
     }
 
     private static IEnumerable<SelectListItem> MapLanguageToSelectListItem(IEnumerable<Language> languages)
     {
-        return languages.Select(l => new SelectListItem { Value = l.Id, Text = l.Name }).ToList();
+        return languages.Select(l => new SelectListItem { Value = l._Language, Text = l.LanguageName }).ToList();
     }
 }
