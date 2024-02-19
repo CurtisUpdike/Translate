@@ -99,6 +99,12 @@ function Dropdown(props) {
 
   let languageOptions = languages.filter(searchFilter).map(createOption);
 
+  let numRows = 15;
+  let columns = [];
+  for (let i = 0; i < languageOptions.length; i += numRows) {
+    columns.push(languageOptions.slice(i, i + numRows));
+  }
+
   return (
     drowpdownWrapper(
       selectedItem({
@@ -112,12 +118,9 @@ function Dropdown(props) {
           onChange: (e) => setSearch(e.target.value) 
         }),
         div({ className: 'columns' },
-          div({ className: 'column', style: { width: '25%' } },
-            ...languageOptions
-          ),
-          div({ className: 'column', style: { width: '25%' } }),
-          div({ className: 'column', style: { width: '25%' } }),
-          div({ className: 'column', style: { width: '25%' } })
+          columns.map(row => div({ className: 'column', style: { width: `${100 / columns.length}%` } },
+            ...row
+          ))
         )
       )
     )

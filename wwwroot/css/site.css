@@ -381,4 +381,6 @@ body {
   padding: 0 3rem 0 1rem;
   background: #262626;
   position: relative;
+  line-height: 14px;
+  letter-spacing: 0.16px;
 }
