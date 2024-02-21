@@ -105,9 +105,14 @@ function Dropdown(props) {
     if(active) setTimeout(() => inputRef?.current.focus(), 50);
   }, [active]);
 
+  function setLanguage(language) {
+    select(language);
+    setSearch('');
+  }
+
   let createOption = ({ id, name }) => 
     option({
-      onClick: () => select({ id, name }),
+      onClick: () => setLanguage({ id, name }),
       name,
       active: id === selected?.id
     });
