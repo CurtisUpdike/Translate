@@ -60,7 +60,7 @@ function App() {
           select: setTarget
         }),
         translationOutput({ value: translation }),
-        copy()
+        copy({ translation })
       )
     )
   );
@@ -136,7 +136,25 @@ function Options({ items }) {
         )
       )
     )
-  )
+  );
+}
+
+
+function Copy({ translation }) {
+  let [active, setActive] = useState(false);
+
+  function onClick() {
+    navigator.clipboard.writeText(translation);
+    setActive(true);
+    setTimeout(() => setActive(false), 1000);
+  }
+
+  return (
+    div({ className: `copy-container ${active ? 'active' : ''}`, onClick }, 
+      copyIcon(),
+      div({ className: 'tooltiptext' }, 'Copied!')
+    )
+  );
 }
 
 
@@ -235,11 +253,7 @@ let option = ({ onClick, active, name }) =>
 
 let options = (props) => createElement(Options, props);
 
-let copy = () => 
-  div({ className: 'copy-container'}, 
-    copyIcon(),
-    div({ className: 'tooltiptext' }, 'Copied!')
-  );
+let copy = (props) => createElement(Copy, props);
 
 let detectedLanguage = (text) =>
   div({ className: 'detected-language-container'}, text);
