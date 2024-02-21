@@ -84,7 +84,8 @@ function Dropdown(props) {
   let [active, setActive] = useState(false);
   let [search, setSearch] = useState('');
   let selectRef = useRef();
-  let searcRef = useRef();
+  let inputRef = useRef();
+  let searchRef = useRef();
 
   useEffect(() => {
     document.addEventListener('mousedown', handler);
@@ -93,12 +94,16 @@ function Dropdown(props) {
     function handler(event) {
       if (selectRef.current.contains(event.target))
         setActive(state => !state);
-      else if (searcRef.current.contains(event.target))
+      else if (searchRef.current.contains(event.target))
         return;
       else
         setActive(false);
     }
-  });
+  }, []);
+
+  useEffect(() => {
+    if(active) setTimeout(() => inputRef?.current.focus(), 50);
+  }, [active]);
 
   let createOption = ({ id, name }) => 
     option({
@@ -120,7 +125,8 @@ function Dropdown(props) {
       }),
       dropdownContent({ active },
         searchBar({ 
-          ref: searcRef, 
+          searchRef,
+          inputRef,
           onChange: (e) => setSearch(e.target.value) 
         }),
         options({ items: languageOptions })
@@ -251,9 +257,9 @@ let searchInput = (props) =>
     ...props
   }));
 
-let searchBar = ({ ref, onChange }) =>
-  div({ className: 'search-bar', ref },
-    searchInput({ onChange }),
+let searchBar = ({ searchRef, inputRef, onChange }) =>
+  div({ className: 'search-bar', ref: searchRef },
+    searchInput({ onChange, ref: inputRef }),
     clearIcon()
   );
 
