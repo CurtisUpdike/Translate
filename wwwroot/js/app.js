@@ -127,7 +127,9 @@ function Dropdown(props) {
         searchBar({ 
           searchRef,
           inputRef,
-          onChange: (e) => setSearch(e.target.value) 
+          value: search,
+          onChange: (e) => setSearch(e.target.value),
+          clear: () => setSearch('')
         }),
         options({ items: languageOptions })
       )
@@ -257,10 +259,10 @@ let searchInput = (props) =>
     ...props
   }));
 
-let searchBar = ({ searchRef, inputRef, onChange }) =>
+let searchBar = ({ searchRef, inputRef, value, onChange, clear }) =>
   div({ className: 'search-bar', ref: searchRef },
-    searchInput({ onChange, ref: inputRef }),
-    clearIcon()
+    searchInput({ value, onChange, ref: inputRef }),
+    clearIcon({ onClick: clear })
   );
 
 let option = ({ onClick, active, name }) =>
@@ -297,8 +299,8 @@ let arrowIcon = ({ active }) =>
   );
 
 
-let clearIcon = () =>
-  createElement('svg', { ...svgAttributes, className: 'icon clear-icon', viewBox: '0 0 16 16'},
+let clearIcon = (props) =>
+  createElement('svg', { ...svgAttributes, className: 'icon clear-icon', viewBox: '0 0 16 16', ...props },
     createElement('path', { d: 'M8,1C4.1,1,1,4.1,1,8s3.1,7,7,7s7-3.1,7-7S11.9,1,8,1z M10.7,11.5L8,8.8l-2.7,2.7l-0.8-0.8L7.2,8L4.5,5.3l0.8-0.8L8,7.2	l2.7-2.7l0.8,0.8L8.8,8l2.7,2.7L10.7,11.5z' })
   );
 
