@@ -92,12 +92,14 @@ function Dropdown(props) {
     return () => document.removeEventListener('mousedown', handler);
 
     function handler(event) {
-      if (selectRef.current.contains(event.target))
-        setActive(state => !state);
-      else if (searchRef.current.contains(event.target))
-        return;
-      else
-        setActive(false);
+      let [selectClicked, searchClicked] = [
+        selectRef.current.contains(event.target), 
+        searchRef.current.contains(event.target)
+      ];
+
+      if (selectClicked) setActive(!active);
+      else if (searchClicked) return;
+      else setActive(false);
     }
   }, []);
 
@@ -110,16 +112,15 @@ function Dropdown(props) {
     setSearch('');
   }
 
-  let createOption = ({ id, name }) => 
-    option({
-      onClick: () => setLanguage({ id, name }),
-      name,
-      active: id === selected?.id
-    });
-
-  let searchFilter = (l) => l.name.toUpperCase().includes(search.toUpperCase());
-
-  let languageOptions = languages.filter(searchFilter).map(createOption);
+  let languageOptions = languages
+    .filter(l => l.name.toUpperCase().includes(search.toUpperCase()))
+    .map(l => (
+      option({
+        onClick: () => setLanguage(l),
+        name: l.name,
+        active: l.id === selected?.id
+      })
+    ));
 
   return (
     drowpdownWrapper(
