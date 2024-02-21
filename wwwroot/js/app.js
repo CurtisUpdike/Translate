@@ -22,6 +22,7 @@ function App() {
   let [target, setTarget] = useState(null);
   let [translation, setTranslation] = useState('');
   let [characterCount, setCharacterCount] = useState(0);
+  let inputRef = useRef();
 
   useEffect(() => {
     fetch('/languages')
@@ -34,11 +35,22 @@ function App() {
 
   function handleInput(event) {
     setCharacterCount(event.target.value.length);
-    translate(event.target.value);
+    translate(source?.id, target?.id);
   }
 
-  async function translate(text) {
-    setTranslation(await fetchTranslation(text, source?.id, target?.id));
+  function handleSourceChange(newSource) {
+    setSource(newSource);
+    translate(newSource?.id, target?.id);
+  }
+
+  function handleTargetChange(newTarget) {
+    setTarget(newTarget);
+    translate(source?.id, newTarget?.id);
+  }
+
+  async function translate(sourceId, targetId) {
+    let text = inputRef.current.value;
+    setTranslation(await fetchTranslation(text, sourceId, targetId));
   }
 
   return (
@@ -47,9 +59,9 @@ function App() {
         dropdown({ 
           languages: allSources, 
           selected: source,
-          select: setSource
+          select: handleSourceChange,
         }),
-        translationInput({ onChange: handleInput }),
+        translationInput({ onChange: handleInput, ref: inputRef }),
         detectedLanguage('English'),
         characterLimit(characterCount)
       ),
@@ -57,7 +69,7 @@ function App() {
         dropdown({ 
           languages: allTargets,
           selected: target,
-          select: setTarget
+          select: handleTargetChange,
         }),
         translationOutput({ value: translation }),
         copy({ translation })
