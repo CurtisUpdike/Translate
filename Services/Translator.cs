@@ -22,7 +22,6 @@ public class Translator
     public string Translate(string text, string sourceId, string targetId)
     {
         if (string.IsNullOrWhiteSpace(text) ||
-            string.IsNullOrEmpty(sourceId) ||
             string.IsNullOrEmpty(targetId))
             return string.Empty;
 

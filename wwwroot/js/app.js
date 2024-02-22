@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function App() {
   let [allSources, setAllSources] = useState([]);
   let [allTargets, setAllTargets] = useState([]);
-  let detect = { id: 'detect', name: 'Detect Language'};
+  let detect = { id: null, name: 'Detect Language'};
   let [source, setSource] = useState(detect);
   let [target, setTarget] = useState(null);
   let [translation, setTranslation] = useState('');
@@ -185,7 +185,7 @@ function Copy({ translation }) {
 
 
 async function fetchTranslation(text, source, target) {
-  if (!source || !target || !text)
+  if (!target || !text)
     return '';
 
   if (source === target)
