@@ -32,7 +32,8 @@ public class IndexModel : PageModel
 
     public void OnPost()
     {
-        Translation = _translator.Translate(Text, SourceId, TargetId);
+        var result = _translator.Translate(Text, SourceId, TargetId);
+        Translation = result?.Translations[0]._Translation ?? "";
 
         SourceOptions = MapLanguageToSelectListItem(_translator.Languages
             .Where(l => l.SupportedAsSource == true));

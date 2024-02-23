@@ -155,6 +155,34 @@ body {
   align-items: center;
 }
 
+.detected-language-container .language-name {
+  margin-right: 5px;
+}
+
+.detected-language-container .confidence {
+  font-size: 80%;
+}
+
+.detected-language-container .confidence .value {
+  display: inline-block;
+}
+
+.detected-language-container .confidence .value::first-letter {
+  text-transform: capitalize;
+}
+
+.detected-language-container .confidence .value.low {
+  color: #ffb3b8;
+}
+
+.detected-language-container .confidence .value.medium {
+  color: #fddc69;
+}
+
+.detected-language-container .confidence .value.high {
+  color: #a7F0ba;
+}
+
 .text-translation .translation-output {
   cursor: default;
 }

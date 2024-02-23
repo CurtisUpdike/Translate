@@ -17,10 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
 function App() {
   let [allSources, setAllSources] = useState([]);
   let [allTargets, setAllTargets] = useState([]);
-  let detect = { id: null, name: 'Detect Language'};
-  let [source, setSource] = useState(detect);
+  let detectDefault = { id: null, name: 'Detect Language'};
+  let [source, setSource] = useState(detectDefault);
   let [target, setTarget] = useState(null);
   let [translation, setTranslation] = useState('');
+  let [detected, setDetected] = useState(null);
   let [characterCount, setCharacterCount] = useState(0);
   let inputRef = useRef();
 
@@ -28,7 +29,7 @@ function App() {
     fetch('/languages')
       .then(response => response.json())
       .then(languages => {
-        setAllSources([detect, ...languages.filter(l => l.supportedAsSource)]);
+        setAllSources([detectDefault, ...languages.filter(l => l.supportedAsSource)]);
         setAllTargets(languages.filter(l => l.supportedAsTarget));
       });
   }, []);
@@ -49,8 +50,26 @@ function App() {
   }
 
   async function translate(sourceId, targetId) {
-    let text = inputRef.current.value;
-    setTranslation(await fetchTranslation(text, sourceId, targetId));
+    try {
+      let result = await fetchTranslation(inputRef.current.value, sourceId, targetId)
+      setTranslation(result.translation);
+      if (result.detectedLanguage && result.detectedConfidence) {
+        let languageName = allSources
+          .filter(l => l.id === result.detectedLanguage)
+          .map(l => l.name)[0];
+          
+        setDetected({
+          language: languageName,
+          confidence: result.detectedConfidence
+        });
+      } else {
+        setDetected(null);
+      }
+    } catch (error) {
+      console.error(error);
+      setTranslation(inputRef.current.value);
+      setDetected(null);
+    }
   }
 
   return (
@@ -62,7 +81,7 @@ function App() {
           select: handleSourceChange,
         }),
         translationInput({ onChange: handleInput, ref: inputRef }),
-        detectedLanguage('English'),
+        detectedLanguage({ detected }),
         characterLimit(characterCount)
       ),
       outputContainer(
@@ -71,7 +90,7 @@ function App() {
           selected: target,
           select: handleTargetChange,
         }),
-        translationOutput({ value: translation }),
+        translationOutput({ value: translation || '' }),
         copy({ translation })
       )
     )
@@ -97,7 +116,7 @@ function Dropdown(props) {
         searchRef.current.contains(event.target)
       ];
 
-      if (selectClicked) setActive(!active);
+      if (selectClicked) setActive(prev => !prev);
       else if (searchClicked) return;
       else setActive(false);
     }
@@ -184,22 +203,45 @@ function Copy({ translation }) {
 }
 
 
+function DetectLanguage({ detected }) {
+  if (!detected) return null;
+
+  let values = ['low', 'medium', 'high'];
+  let index = Math.floor((detected.confidence / (1 / values.length)));
+  let value = values[index];
+
+  return (
+    div({ className: 'detected-language-container'},
+      span({ className: 'language-name' }, detected.language),
+      span({ className: 'confidence' },
+        "-- ",
+        span({ className: `value ${value}`}, `${value} Confidence`)))
+  );
+}
+
+
 async function fetchTranslation(text, source, target) {
-  if (!target || !text)
-    return '';
+  let defaultResponse = {
+    translation: null,
+    detectedLanguage: null,
+    detectedConfidence: null
+  };
 
-  if (source === target)
-    return text;
+  if (!target || !text) return defaultResponse;
+  if (source === target) return { ...defaultResponse, translation: text };
 
-  let request = {
+  try {
+    let response = await fetch('/translate', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ Text: text, SourceId: source, TargetId: target })
-  };
-
-  let response = await fetch('/translate', request);
-  let body = await response.json();
-  return body.translation;
+    });
+    
+    let body = await response.json();
+    return { ...defaultResponse, ...body };
+  } catch (error) {
+    return { ...defaultResponse, translation: text }
+  }
 }
 
 
@@ -208,6 +250,9 @@ let withStrictMode = (element) =>
 
 let div = (props, ...children) =>
   createElement('div', props, ...children);
+
+let span = (props, ...children) =>
+  createElement('span', props, ...children);
 
 let input = (props, ...children) =>
   createElement('input', props, ...children);
@@ -281,9 +326,7 @@ let options = (props) => createElement(Options, props);
 
 let copy = (props) => createElement(Copy, props);
 
-let detectedLanguage = (text) =>
-  div({ className: 'detected-language-container'}, text);
-
+let detectedLanguage = (props) => createElement(DetectLanguage, props);
 
 let svgAttributes = {
   focusable: 'false', 

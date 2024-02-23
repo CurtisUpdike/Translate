@@ -19,20 +19,16 @@ public class Translator
         _translator.WithHeader("X-Watson-Learning-Opt-Out", "true");
     }
 
-    public string Translate(string text, string sourceId, string targetId)
+    public TranslationResult? Translate(string text, string sourceId, string targetId)
     {
-        if (string.IsNullOrWhiteSpace(text) ||
-            string.IsNullOrEmpty(targetId))
-            return string.Empty;
-
-        if (sourceId == targetId)
-            return text;
+        if (string.IsNullOrWhiteSpace(text) || string.IsNullOrEmpty(targetId))
+            return null;
 
         var result = _translator.Translate(
             text: new() { text },
             source: sourceId,
-            target: targetId);
+            target: targetId).Result;
 
-        return result.Result.Translations[0]._Translation;
+        return result;
     }
 }

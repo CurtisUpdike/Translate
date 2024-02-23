@@ -20,10 +20,15 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapPost("/translate", (Translator translator, RequestBody body) =>
+app.MapPost("/translate", (Translator translator, TranslateRequestBody body) =>
 {
-    string translation = translator.Translate(body.Text, body.SourceId, body.TargetId);
-    return new { translation };
+    var result = translator.Translate(body.Text, body.SourceId, body.TargetId);
+    return new
+    {
+        translation = result?.Translations[0]._Translation,
+        detectedLanguage = result?.DetectedLanguage,
+        detectedConfidence = result?.DetectedLanguageConfidence
+    };
 });
 
 app.MapGet("/languages", (Translator translator) =>
@@ -41,7 +46,7 @@ app.MapRazorPages();
 
 app.Run();
 
-public record RequestBody(
+public record TranslateRequestBody(
     string SourceId,
     string TargetId,
     string Text);
