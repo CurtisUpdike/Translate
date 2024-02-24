@@ -15,9 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function App() {
+  const detectDefault = { id: null, name: 'Detect Language'};
+  const maxLength = 10000;
+
   let [allSources, setAllSources] = useState([]);
   let [allTargets, setAllTargets] = useState([]);
-  let detectDefault = { id: null, name: 'Detect Language'};
   let [source, setSource] = useState(detectDefault);
   let [target, setTarget] = useState(null);
   let [translation, setTranslation] = useState('');
@@ -80,9 +82,9 @@ function App() {
           selected: source,
           select: handleSourceChange,
         }),
-        translationInput({ onChange: handleInput, ref: inputRef }),
+        translationInput({ onChange: handleInput, ref: inputRef, maxLength }),
         detectedLanguage({ detected }),
-        characterLimit(characterCount)
+        characterLimit({ characterCount, maxLength })
       ),
       outputContainer(
         dropdown({ 
@@ -266,8 +268,8 @@ let inputContainer = (...children) =>
 let outputContainer = (...children) =>
   div({ className: 'form translation-output' }, ...children);
 
-let characterLimit = (count) =>
-  div({ className: 'character-limit' }, `${count}/10000`);
+let characterLimit = ({ characterCount, maxLength }) =>
+  div({ className: 'character-limit' }, `${characterCount}/${maxLength}`);
 
 let drowpdownWrapper = (...children) =>
   div({ className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, ...children)
