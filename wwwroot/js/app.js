@@ -213,7 +213,7 @@ function DetectLanguage({ detected }) {
   let value = values[index];
 
   return (
-    div({ className: 'detected-language-container'},
+    div({ className: 'detected'},
       span({ className: 'language-name' }, detected.language),
       span({ className: 'confidence' },
         "-- ",

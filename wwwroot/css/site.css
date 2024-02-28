@@ -162,7 +162,7 @@ body {
   top: 285px;
 }
 
-.app .form .detected-language-container {
+.detected {
   position: absolute;
   top: 285px;
   font-size: 16px;
@@ -170,31 +170,31 @@ body {
   align-items: center;
 }
 
-.detected-language-container .language-name {
+.detected .language-name {
   margin-right: 5px;
 }
 
-.detected-language-container .confidence {
+.detected .confidence {
   font-size: 80%;
 }
 
-.detected-language-container .confidence .value {
+.detected .confidence .value {
   display: inline-block;
 }
 
-.detected-language-container .confidence .value::first-letter {
+.detected .confidence .value::first-letter {
   text-transform: capitalize;
 }
 
-.detected-language-container .confidence .value.low {
+.detected .confidence .value.low {
   color: #ffb3b8;
 }
 
-.detected-language-container .confidence .value.medium {
+.detected .confidence .value.medium {
   color: #fddc69;
 }
 
-.detected-language-container .confidence .value.high {
+.detected .confidence .value.high {
   color: #a7F0ba;
 }
 
