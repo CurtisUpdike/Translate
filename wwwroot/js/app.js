@@ -197,9 +197,9 @@ function Copy({ translation }) {
   }
 
   return (
-    div({ className: `copy-container ${active ? 'active' : ''}`, onClick }, 
+    div({ className: `copy-button ${active ? 'active' : ''}`, onClick }, 
       copyIcon(),
-      div({ className: 'tooltiptext' }, 'Copied!')
+      div({ className: 'tooltip' }, 'Copied!')
     )
   );
 }
