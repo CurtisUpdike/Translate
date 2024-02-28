@@ -260,7 +260,7 @@ let input = (props, ...children) =>
   createElement('input', props, ...children);
 
 let appContainer = (...children) =>
-  div({ className: 'text-translation' }, ...children);
+  div({ className: 'app' }, ...children);
 
 let inputContainer = (...children) =>
   div({ className: 'form' }, ...children);
@@ -274,14 +274,6 @@ let characterLimit = ({ characterCount, maxLength }) =>
 let drowpdownWrapper = (...children) =>
   div({ className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, ...children)
 
-let inputWrapper = (...children) =>
-  div({ className: 'form-item' },
-    div({ className: 'text-input-wrapper' }, ...children));
-
-let textAreaWrapper = (...children) =>
-  div({ className: 'form-item'}, 
-    div({ className: 'text-area-wrapper' }, ...children));
-
 let translationInput = (props) =>
   textarea({ placeholder: 'Enter text', ...props });
 
@@ -289,8 +281,8 @@ let translationOutput = (props) =>
   textarea({ placeholder: 'Translation', readOnly: true, ...props });
 
 let textarea = (props) =>
-  textAreaWrapper(
-    createElement('textarea', { className: 'text-area', rows: '10', ...props }));
+  div({ className: 'textarea-wrapper' }, 
+    createElement('textarea', { className: 'textarea', rows: '10', ...props }));
 
 let dropdown = ({ languages, selected, select }) => 
   createElement(Dropdown, { languages, selected, select });
@@ -305,12 +297,13 @@ let selectedItem = ({ ref, name, active}) =>
   );
 
 let searchInput = (props) =>
-  inputWrapper(input({
-    className: 'text-input',
-    placeholder: 'Search...',
-    type: 'text',
-    ...props
-  }));
+  div({ className: 'input-wrapper' },
+    input({
+      className: 'input',
+      placeholder: 'Search...',
+      type: 'text',
+      ...props
+    }));
 
 let searchBar = ({ searchRef, inputRef, value, onChange, clear }) =>
   div({ className: 'search-bar', ref: searchRef },

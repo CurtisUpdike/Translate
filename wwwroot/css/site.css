@@ -142,7 +142,7 @@ body {
   font-size: .875rem;
 }
 
-.text-translation {
+.app {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -150,19 +150,19 @@ body {
   margin-bottom: 60px;
 }
 
-.text-translation .form {
+.app .form {
   position: relative;
   width: 45%;
   max-width: 600px;
 }
 
-.text-translation .form .character-limit {
+.app .form .character-limit {
   position: absolute;
   right: 0;
   top: 285px;
 }
 
-.text-translation .form .detected-language-container {
+.app .form .detected-language-container {
   position: absolute;
   top: 285px;
   font-size: 16px;
@@ -196,10 +196,6 @@ body {
 
 .detected-language-container .confidence .value.high {
   color: #a7F0ba;
-}
-
-.text-translation .translation-output {
-  cursor: default;
 }
 
 .language-dropdown {
@@ -327,53 +323,24 @@ body {
   visibility: visible;
 }
 
-.text-input:focus, .text-input:active {
-  outline: 2px solid #fff;
-  outline-offset: -2px;
-}
-
-.form-item {
-  font-size: .875rem;
-  font-weight: 400;
-  line-height: 1.125rem;
-  letter-spacing: .16px;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  align-items: flex-start;
-}
-
-.text-area-wrapper {
+.textarea-wrapper {
   position: relative;
   display: flex;
   width: 100%;
 }
 
-.text-input-wrapper {
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
 }
 
-.text-translation .form textarea {
-  padding: 0.6875rem 2.5rem 0.6875rem 1rem;
-  resize: none;
-}
-
-.text-translation .text-area {
-  font-size: 20px;
-}
-
-.text-translation .text-area::placeholder {
-  font-size: 14px;
-}
-
-.translation-output .text-area  {
+.translation-output textarea  {
   cursor: default;
 }
 
-.text-input {
+input {
   font-size: .875rem;
   font-weight: 400;
   line-height: 1.125rem;
@@ -390,8 +357,14 @@ body {
   transition: background-color 70ms cubic-bezier(0.2, 0, 0.38, 0.9),outline 70ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
-.text-area {
-  font-size: .875rem;
+input:focus, 
+input:active {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
+}
+
+textarea {
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.25rem;
   letter-spacing: .16px;
@@ -401,13 +374,17 @@ body {
   width: 100%;
   min-width: 10rem;
   min-height: 2.5rem;
-  padding: 0.6875rem 1rem;
+  padding: 0.6875rem 2.5rem 0.6875rem 1rem;
   color: #f4f4f4;
   order: 3;
-  resize: vertical;
+  resize: none;
   border: none;
   border-bottom: 1px solid #6f6f6f;
   transition: background-color 70ms cubic-bezier(0.2, 0, 0.38, 0.9),outline 70ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+
+textarea::placeholder {
+  font-size: 14px;
 }
 
 .dropdown .dropdown-content .columns {
