@@ -1,3 +1,4 @@
+using IBM.Watson.LanguageTranslator.v3.Model;
 using Translate.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +23,13 @@ app.UseAuthorization();
 
 app.MapPost("/translate", (Translator translator, TranslateRequestBody body) =>
 {
-    var result = translator.Translate(body.Text, body.SourceId, body.TargetId);
+    TranslationResult? result = null;
+    try
+    {
+        result = translator.Translate(body.Text, body.SourceId, body.TargetId);
+    }
+    catch {}
+
     return new
     {
         translation = result?.Translations[0]._Translation,
