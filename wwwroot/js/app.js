@@ -30,13 +30,14 @@ function App() {
   let inputRef = useRef();
 
   useEffect(() => {
-    fetch('/api/languages')
-      .then(response => response.json())
-      .then(languages => {
-        setAllSources([detectDefault, ...languages.filter(l => l.supportedAsSource)]);
-        setAllTargets(languages.filter(l => l.supportedAsTarget));
-      });
+    loadLanguages();
   }, []);
+
+  async function loadLanguages() {
+    let languages = await api.languages();
+    setAllSources([detectDefault, ...languages.filter(l => l.supportedAsSource)]);
+    setAllTargets(languages.filter(l => l.supportedAsTarget));
+  }
 
   function handleInput(event) {
     setCharacterCount(event.target.value.length);
@@ -54,27 +55,22 @@ function App() {
   }
 
   async function translate(sourceId, targetId) {
-    try {
-      let result = await fetchTranslation(inputRef.current.value, sourceId, targetId)
-      setTranslation(result.translation);
-      if (result.detectedLanguage && result.detectedConfidence) {
-        let languageName = allSources
-          .filter(l => l.id === result.detectedLanguage)
-          .map(l => l.name)[0];
-          
-        setDetected({
-          language: languageName,
-          confidence: result.detectedConfidence
-        });
-      } else {
-        setDetected(null);
-      }
-    } catch (error) {
-      console.error(error);
-      setTranslation(inputRef.current.value);
+    let result = await api.translate(inputRef.current.value, sourceId, targetId)
+    setTranslation(result.translation);
+    if (result.detectedLanguage && result.detectedConfidence) {        
+      setDetected({
+        language: getLanguageName(result.detectedLanguage),
+        confidence: result.detectedConfidence
+      });
+    } else {
       setDetected(null);
     }
   }
+
+  let getLanguageName = (languageId) => allSources
+    .filter(l => l.id === languageId)
+    .map(l => l.name)
+    .at(0) || null;
 
   return (
     appContainer(
@@ -331,26 +327,28 @@ let copyIcon = () =>
 
 // Api
 
-async function fetchTranslation(text, source, target) {
-  let defaultResponse = {
-    translation: null,
-    detectedLanguage: null,
-    detectedConfidence: null
-  };
-
-  if (!target || !text) return defaultResponse;
-  if (source === target) return { ...defaultResponse, translation: text };
-
-  try {
+let api = {
+  languages: async () => {
+    let response = await fetch('/api/languages');
+    return await response.json();
+  },
+  
+  translate: async (text, sourceId, targetId) => {
+    let defaultResponse = {
+      translation: null,
+      detectedLanguage: null,
+      detectedConfidence: null
+    };
+  
+    if (!targetId || !text) return defaultResponse;
+    if (sourceId === targetId) return { ...defaultResponse, translation: text };
+  
     let response = await fetch('/api/translate', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ Text: text, SourceId: source, TargetId: target })
+      body: JSON.stringify({ text, sourceId, targetId })
     });
     
-    let body = await response.json();
-    return { ...defaultResponse, ...body };
-  } catch (error) {
-    return { ...defaultResponse, translation: text }
+    return await response.json();
   }
-}
+};
