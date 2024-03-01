@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// Stateful Components
+
 function App() {
   const detectDefault = { id: null, name: 'Detect Language'};
   const maxLength = 10000;
@@ -165,6 +167,26 @@ function Dropdown(props) {
 }
 
 
+function Copy({ translation }) {
+  let [active, setActive] = useState(false);
+
+  function onClick() {
+    navigator.clipboard.writeText(translation);
+    setActive(true);
+    setTimeout(() => setActive(false), 1000);
+  }
+
+  return (
+    div({ className: `copy-button ${active ? 'active' : ''}`, onClick }, 
+      copyIcon(),
+      div({ className: 'tooltip' }, 'Copied!')
+    )
+  );
+}
+
+
+// Pure Components
+
 function Options({ items }) {
   let numRows = 15;
   let columns = [];
@@ -187,24 +209,6 @@ function Options({ items }) {
 }
 
 
-function Copy({ translation }) {
-  let [active, setActive] = useState(false);
-
-  function onClick() {
-    navigator.clipboard.writeText(translation);
-    setActive(true);
-    setTimeout(() => setActive(false), 1000);
-  }
-
-  return (
-    div({ className: `copy-button ${active ? 'active' : ''}`, onClick }, 
-      copyIcon(),
-      div({ className: 'tooltip' }, 'Copied!')
-    )
-  );
-}
-
-
 function DetectLanguage({ detected }) {
   if (!detected) return null;
 
@@ -221,6 +225,111 @@ function DetectLanguage({ detected }) {
   );
 }
 
+
+// Component Elements
+
+let withStrictMode = (element) => createElement(StrictMode, null, createElement(element));
+let dropdown = (props) => createElement(Dropdown, props);
+let options = (props) => createElement(Options, props);
+let copy = (props) => createElement(Copy, props);
+let detectedLanguage = (props) => createElement(DetectLanguage, props);
+
+
+// HTML Elements
+
+let div = (props, ...children) => createElement('div', props, ...children);
+let span = (props, ...children) => createElement('span', props, ...children);
+let input = (props, ...children) => createElement('input', props, ...children);
+let textarea = (props, ...children) => createElement('textarea', props, ...children);
+let svg = (props, ...children) => createElement('svg', props, ...children);
+let path = (props, ...children) => createElement('path', props, ...children);
+
+
+// Composed Elements
+
+let appContainer = (...children) =>
+  div({ className: 'app' }, ...children);
+
+let inputContainer = (...children) =>
+  div({ className: 'form' }, ...children);
+
+let outputContainer = (...children) =>
+  div({ className: 'form translation-output' }, ...children);
+
+let characterLimit = ({ characterCount, maxLength }) =>
+  div({ className: 'character-limit' }, `${characterCount}/${maxLength}`);
+
+let drowpdownWrapper = (...children) =>
+  div({ className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, ...children)
+
+let translationInput = (props) =>
+  text({ placeholder: 'Enter text', ...props });
+
+let translationOutput = (props) =>
+  text({ placeholder: 'Translation', readOnly: true, ...props });
+
+let text = (props) =>
+  div({ className: 'textarea-wrapper' }, 
+    textarea({ className: 'textarea', rows: '10', ...props }));
+
+let dropdownContent = ({ active }, ...children) =>
+  div({ className: `dropdown-content ${active ? 'active' : ''}` }, ...children);
+
+let selectedItem = ({ ref, name, active}) =>
+  div({ className: 'selected-item option', ref }, 
+    name || 'Select', 
+    arrowIcon({ active }));
+
+let searchInput = (props) =>
+  div({ className: 'input-wrapper' },
+    input({
+      className: 'input',
+      placeholder: 'Search...',
+      type: 'text',
+      ...props
+    }));
+
+let searchBar = ({ searchRef, inputRef, value, onChange, clear }) =>
+  div({ className: 'search-bar', ref: searchRef },
+    searchInput({ value, onChange, ref: inputRef }),
+    clearIcon({ onClick: clear }));
+
+let option = ({ onClick, active, name }) =>
+  div({ className: 'option', onClick },
+    name,
+    checkIcon({ active }));
+
+let svgAttributes = {
+  focusable: 'false', 
+  preserveAspectRatio: 'xMidYMid meet',
+  fill: '#ffffff',
+  xmlns: 'http://www.w3.org/2000/svg',
+  width: '16',
+  height: '16',
+  'aria-hidden': 'true',
+  style: { willChange: 'transform' }
+};
+
+let arrowIcon = ({ active }) => 
+  div({ className: `icon open-close-arrow ${active ? 'active' : ''}` },
+    svg({ ...svgAttributes, viewBox: '0 0 16 16' }, 
+      path({ d: 'M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z'})));
+
+let clearIcon = (props) =>
+  svg({ ...svgAttributes, className: 'icon clear-icon', viewBox: '0 0 16 16', ...props },
+    path({ d: 'M8,1C4.1,1,1,4.1,1,8s3.1,7,7,7s7-3.1,7-7S11.9,1,8,1z M10.7,11.5L8,8.8l-2.7,2.7l-0.8-0.8L7.2,8L4.5,5.3l0.8-0.8L8,7.2	l2.7-2.7l0.8,0.8L8.8,8l2.7,2.7L10.7,11.5z' }));
+
+let checkIcon = ({ active }) => 
+  svg({ ...svgAttributes, className: `icon check-icon ${active ? 'active' : ''}`, viewBox: '0 0 32 32' },
+    path({ d: 'M12 21.2L4.9 14.1 3.5 15.5 10.6 22.6 12 24 26.1 9.9 24.7 8.4z' }));
+
+let copyIcon = () =>
+  svg({ ...svgAttributes, viewBox: '0 0 32 32' },
+    path({ d: 'M28,10V28H10V10H28m0-2H10a2,2,0,0,0-2,2V28a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2Z' }),
+    path({ d: 'M4,18H2V4A2,2,0,0,1,4,2H18V4H4Z' }));
+
+
+// Api
 
 async function fetchTranslation(text, source, target) {
   let defaultResponse = {
@@ -245,122 +354,3 @@ async function fetchTranslation(text, source, target) {
     return { ...defaultResponse, translation: text }
   }
 }
-
-
-let withStrictMode = (element) =>
-  createElement(StrictMode, null, createElement(element));
-
-let div = (props, ...children) =>
-  createElement('div', props, ...children);
-
-let span = (props, ...children) =>
-  createElement('span', props, ...children);
-
-let input = (props, ...children) =>
-  createElement('input', props, ...children);
-
-let appContainer = (...children) =>
-  div({ className: 'app' }, ...children);
-
-let inputContainer = (...children) =>
-  div({ className: 'form' }, ...children);
-
-let outputContainer = (...children) =>
-  div({ className: 'form translation-output' }, ...children);
-
-let characterLimit = ({ characterCount, maxLength }) =>
-  div({ className: 'character-limit' }, `${characterCount}/${maxLength}`);
-
-let drowpdownWrapper = (...children) =>
-  div({ className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, ...children)
-
-let translationInput = (props) =>
-  textarea({ placeholder: 'Enter text', ...props });
-
-let translationOutput = (props) =>
-  textarea({ placeholder: 'Translation', readOnly: true, ...props });
-
-let textarea = (props) =>
-  div({ className: 'textarea-wrapper' }, 
-    createElement('textarea', { className: 'textarea', rows: '10', ...props }));
-
-let dropdown = ({ languages, selected, select }) => 
-  createElement(Dropdown, { languages, selected, select });
-
-let dropdownContent = ({ active }, ...children) =>
-  div({ className: `dropdown-content ${active ? 'active' : ''}` }, ...children);
-
-let selectedItem = ({ ref, name, active}) =>
-  div({ className: 'selected-item option', ref }, 
-    name || 'Select', 
-    arrowIcon({ active })
-  );
-
-let searchInput = (props) =>
-  div({ className: 'input-wrapper' },
-    input({
-      className: 'input',
-      placeholder: 'Search...',
-      type: 'text',
-      ...props
-    }));
-
-let searchBar = ({ searchRef, inputRef, value, onChange, clear }) =>
-  div({ className: 'search-bar', ref: searchRef },
-    searchInput({ value, onChange, ref: inputRef }),
-    clearIcon({ onClick: clear })
-  );
-
-let option = ({ onClick, active, name }) =>
-  div({ className: 'option', onClick },
-    name,
-    checkIcon({ active })
-  );
-
-let options = (props) => createElement(Options, props);
-
-let copy = (props) => createElement(Copy, props);
-
-let detectedLanguage = (props) => createElement(DetectLanguage, props);
-
-let svgAttributes = {
-  focusable: 'false', 
-  preserveAspectRatio: 'xMidYMid meet',
-  fill: '#ffffff',
-  xmlns: 'http://www.w3.org/2000/svg',
-  width: '16',
-  height: '16',
-  'aria-hidden': 'true',
-  style: { willChange: 'transform' }
-};
-
-
-let arrowIcon = ({ active }) => 
-  createElement('div', { className: `icon open-close-arrow ${active ? 'active' : ''}` },
-    createElement('svg', { ...svgAttributes, viewBox: '0 0 16 16' }, 
-      createElement('path', { d: 'M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z'})
-    )
-  );
-
-
-let clearIcon = (props) =>
-  createElement('svg', { ...svgAttributes, className: 'icon clear-icon', viewBox: '0 0 16 16', ...props },
-    createElement('path', { d: 'M8,1C4.1,1,1,4.1,1,8s3.1,7,7,7s7-3.1,7-7S11.9,1,8,1z M10.7,11.5L8,8.8l-2.7,2.7l-0.8-0.8L7.2,8L4.5,5.3l0.8-0.8L8,7.2	l2.7-2.7l0.8,0.8L8.8,8l2.7,2.7L10.7,11.5z' })
-  );
-
-
-let checkIcon = ({ active }) => 
-  createElement('svg', { 
-      ...svgAttributes, 
-      className: `icon check-icon ${active ? 'active' : ''}`, 
-      viewBox: '0 0 32 32' 
-    },
-    createElement('path', { d: 'M12 21.2L4.9 14.1 3.5 15.5 10.6 22.6 12 24 26.1 9.9 24.7 8.4z' })
-  );
-
-
-let copyIcon = () =>
-  createElement('svg', { ...svgAttributes, viewBox: '0 0 32 32' },
-    createElement('path', { d: 'M28,10V28H10V10H28m0-2H10a2,2,0,0,0-2,2V28a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2Z' }),
-    createElement('path', { d: 'M4,18H2V4A2,2,0,0,1,4,2H18V4H4Z' })
-  );
