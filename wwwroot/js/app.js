@@ -28,7 +28,7 @@ function App() {
   let inputRef = useRef();
 
   useEffect(() => {
-    fetch('/languages')
+    fetch('/api/languages')
       .then(response => response.json())
       .then(languages => {
         setAllSources([detectDefault, ...languages.filter(l => l.supportedAsSource)]);
@@ -233,7 +233,7 @@ async function fetchTranslation(text, source, target) {
   if (source === target) return { ...defaultResponse, translation: text };
 
   try {
-    let response = await fetch('/translate', {
+    let response = await fetch('/api/translate', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ Text: text, SourceId: source, TargetId: target })

@@ -21,7 +21,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapPost("/translate", (Translator translator, TranslateRequestBody body) =>
+app.MapPost("/api/translate", (Translator translator, TranslateRequestBody body) =>
 {
     TranslationResult? result = null;
     try
@@ -38,16 +38,14 @@ app.MapPost("/translate", (Translator translator, TranslateRequestBody body) =>
     };
 });
 
-app.MapGet("/languages", (Translator translator) =>
-{
-    return translator.Languages.Select(l => new
+app.MapGet("/api/languages", (Translator translator) =>
+    translator.Languages.Select(l => new
     {
         id = l._Language,
         name = l.LanguageName,
         supportedAsSource = l.SupportedAsSource,
         supportedAsTarget = l.SupportedAsTarget
-    });
-});
+    }));
 
 app.MapRazorPages();
 
