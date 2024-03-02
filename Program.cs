@@ -41,14 +41,7 @@ app.MapPost("/api/translate", (Translator translator, TranslateRequestBody body)
 app.MapPost("/api/identify", (Translator translator, IdentifyRequestBody body) =>
     translator.Identify(body.Text));
 
-app.MapGet("/api/languages", (Translator translator) =>
-    translator.Languages.Select(l => new
-    {
-        id = l._Language,
-        name = l.LanguageName,
-        supportedAsSource = l.SupportedAsSource,
-        supportedAsTarget = l.SupportedAsTarget
-    }));
+app.MapGet("/api/languages", (Translator translator) => translator.LanguagesJson);
 
 app.MapRazorPages();
 

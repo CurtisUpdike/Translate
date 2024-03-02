@@ -335,7 +335,14 @@ let copyIcon = () =>
 let api = {
   languages: async () => {
     let response = await fetch('/api/languages');
-    return await response.json();
+    let body = await response.json();
+
+    return body.languages.map(l => ({
+      id: l.language,
+      name: l.language_name,
+      supportedAsSource: l.supported_as_source,
+      supportedAsTarget: l.supported_as_target,
+    }))
   },
   
   translate: async (text, sourceId, targetId) => {

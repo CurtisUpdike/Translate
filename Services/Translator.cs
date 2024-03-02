@@ -11,6 +11,8 @@ public class Translator
     public IEnumerable<Language> Languages =>
         _translator.ListLanguages().Result._Languages;
 
+    public string LanguagesJson => _translator.ListLanguages().Response;
+
     public Translator(IConfiguration config)
     {
         _translator = new("2018-05-01", new IamAuthenticator(
