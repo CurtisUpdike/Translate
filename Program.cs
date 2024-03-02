@@ -1,4 +1,3 @@
-using IBM.Watson.LanguageTranslator.v3.Model;
 using Translate.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,21 +21,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapPost("/api/translate", (Translator translator, TranslateRequestBody body) =>
-{
-    TranslationResult? result = null;
-    try
-    {
-        result = translator.Translate(body.Text, body.SourceId, body.TargetId);
-    }
-    catch {}
-
-    return new
-    {
-        translation = result?.Translations[0]._Translation,
-        detectedLanguage = result?.DetectedLanguage,
-        detectedConfidence = result?.DetectedLanguageConfidence
-    };
-});
+    translator.Translate(body.Text, body.SourceId, body.TargetId));
 
 app.MapPost("/api/identify", (Translator translator, IdentifyRequestBody body) =>
     translator.Identify(body.Text));

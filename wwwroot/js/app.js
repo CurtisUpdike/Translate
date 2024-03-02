@@ -55,6 +55,9 @@ function App() {
   }
 
   async function translate(sourceId, targetId) {
+    if (!targetId || !inputRef.current.value) return;
+    if (sourceId === targetId) return;
+
     let result = await api.translate(inputRef.current.value, sourceId, targetId)
     setTranslation(result.translation);
     if (result.detectedLanguage && result.detectedConfidence) {        
@@ -346,22 +349,18 @@ let api = {
   },
   
   translate: async (text, sourceId, targetId) => {
-    let defaultResponse = {
-      translation: null,
-      detectedLanguage: null,
-      detectedConfidence: null
-    };
-  
-    if (!targetId || !text) return defaultResponse;
-    if (sourceId === targetId) return { ...defaultResponse, translation: text };
-  
     let response = await fetch('/api/translate', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, sourceId, targetId })
     });
-    
-    return await response.json();
+    let body = await response.json();
+
+    return {
+      translation: body.translations?.at(0).translation,
+      detectedLanguage: body.detected_language,
+      detectedConfidence: body.detected_language_confidence
+    };
   },
 
   identify: async (text) => {
