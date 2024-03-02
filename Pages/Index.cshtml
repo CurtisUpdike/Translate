@@ -7,9 +7,7 @@
             <option value="">-- Select Language --</option>
         </select>
         <textarea asp-for="Text" cols="80" rows="10" placeholder="Enter text" maxlength="10000" ></textarea>
-        <div id="sourceControls">
-            <button>Translate</button>
-        </div>
+        <button>Translate</button>
     </div>
     <div class="form-section">
         <select asp-for="TargetId" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">

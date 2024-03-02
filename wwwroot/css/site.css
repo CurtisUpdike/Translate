@@ -2,6 +2,11 @@
   box-sizing: border-box;
 }
 
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 html {
   font-size: 16px;
   height: 100%;
@@ -24,6 +29,7 @@ h1 {
   font-weight: 300;
   font-size: 36px;
   letter-spacing: 0;
+  animation: fadein 0.5s;
 }
 
 main {
@@ -84,6 +90,13 @@ input {
   padding: 0 1rem;
 }
 
+select {
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  padding: 0;
+}
+
 textarea {
   padding: 0.6875rem 2.5rem 0.6875rem 1rem;
   resize: none;
@@ -115,6 +128,8 @@ button {
   padding: 6px 16px;
   margin-top: 3px;
   transition: all 70ms cubic-bezier(0, 0, 0.38, 0.9);
+  margin-top: 10px;
+  animation: fadein 2s;
 }
 
 button:hover {
@@ -127,16 +142,38 @@ button:active {
 
 .app {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  flex-direction: column;
+  justify-content: center;
+  gap: 50px;
   position: relative;
   margin-bottom: 60px;
+  padding: 0 50px 50px;
+  width: 100%;
+  animation: fadein 1s;
+}
+
+@media (min-width: 1024px) {
+  .app {
+    flex-direction: row;
+  }
 }
 
 .form-section {
   position: relative;
-  width: 45%;
-  max-width: 600px;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .form-section {
+    width: 300px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .form-section {
+    width: 45%;
+    max-width: 600px;
+  }
 }
 
 .dropdown {
