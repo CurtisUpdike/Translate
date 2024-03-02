@@ -323,9 +323,14 @@ textarea.output  {
   flex-direction: row;
 }
 
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
 .detected {
-  position: absolute;
-  top: 285px;
   font-size: 16px;
   display: flex;
   align-items: center;
@@ -357,10 +362,4 @@ textarea.output  {
 
 .detected .confidence .value.high {
   color: #a7F0ba;
-}
-
-.character-limit {
-  position: absolute;
-  right: 0;
-  top: 285px;
 }

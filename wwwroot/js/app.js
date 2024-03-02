@@ -81,8 +81,10 @@ function App() {
           select: handleSourceChange,
         }),
         translationInput({ onChange: handleInput, ref: inputRef, maxLength }),
-        detectedLanguage({ detected }),
-        characterLimit({ characterCount, maxLength })
+        infoContainer(
+          detectedLanguage({ detected }),
+          characterLimit({ characterCount, maxLength })
+        )
       ),
       outputContainer(
         dropdown({ 
@@ -206,7 +208,7 @@ function Options({ items }) {
 
 
 function DetectLanguage({ detected }) {
-  if (!detected) return null;
+  if (!detected) return div({ className: 'detected'});
 
   let values = ['low', 'medium', 'high'];
   let index = Math.floor((detected.confidence / (1 / values.length)));
@@ -251,6 +253,9 @@ let inputContainer = (...children) =>
 
 let outputContainer = (...children) =>
   div({ className: 'form-section' }, ...children);
+
+let infoContainer = (...children) =>
+  div({ className: 'info' }, ...children);
 
 let characterLimit = ({ characterCount, maxLength }) =>
   div({ className: 'character-limit' }, `${characterCount}/${maxLength}`);
