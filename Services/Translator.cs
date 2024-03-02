@@ -31,4 +31,6 @@ public class Translator
 
         return result;
     }
+
+    public string Identify(string text) => _translator.Identify(text).Response;
 }

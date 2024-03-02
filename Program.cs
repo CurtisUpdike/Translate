@@ -38,6 +38,9 @@ app.MapPost("/api/translate", (Translator translator, TranslateRequestBody body)
     };
 });
 
+app.MapPost("/api/identify", (Translator translator, IdentifyRequestBody body) =>
+    translator.Identify(body.Text));
+
 app.MapGet("/api/languages", (Translator translator) =>
     translator.Languages.Select(l => new
     {
@@ -51,7 +54,5 @@ app.MapRazorPages();
 
 app.Run();
 
-public record TranslateRequestBody(
-    string SourceId,
-    string TargetId,
-    string Text);
+public record TranslateRequestBody(string SourceId, string TargetId, string Text);
+public record IdentifyRequestBody(string Text);

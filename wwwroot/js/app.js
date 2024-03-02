@@ -355,5 +355,16 @@ let api = {
     });
     
     return await response.json();
+  },
+
+  identify: async (text) => {
+    let response = await fetch('/api/identify', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    })
+
+    let { languages } = await response.json();
+    return languages[0];
   }
 };
