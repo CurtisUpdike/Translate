@@ -214,7 +214,7 @@ function DetectLanguage({ detected }) {
 
   return (
     div({ className: 'detected'},
-      span({ className: 'language-name' }, detected.language),
+      span({ className: 'language' }, detected.language),
       span({ className: 'confidence' },
         "-- ",
         span({ className: `value ${value}`}, `${value} Confidence`)))
@@ -247,32 +247,32 @@ let appContainer = (...children) =>
   div({ className: 'app' }, ...children);
 
 let inputContainer = (...children) =>
-  div({ className: 'form' }, ...children);
+  div({ className: 'form-section' }, ...children);
 
 let outputContainer = (...children) =>
-  div({ className: 'form translation-output' }, ...children);
+  div({ className: 'form-section' }, ...children);
 
 let characterLimit = ({ characterCount, maxLength }) =>
   div({ className: 'character-limit' }, `${characterCount}/${maxLength}`);
 
 let drowpdownWrapper = (...children) =>
-  div({ className: 'dropdown language-dropdown', 'aria-label': 'Dropdown' }, ...children)
+  div({ className: 'dropdown', 'aria-label': 'Dropdown' }, ...children)
 
 let translationInput = (props) =>
   text({ placeholder: 'Enter text', ...props });
 
 let translationOutput = (props) =>
-  text({ placeholder: 'Translation', readOnly: true, ...props });
+  text({ placeholder: 'Translation', className: 'output', readOnly: true, ...props });
 
 let text = (props) =>
   div({ className: 'textarea-wrapper' }, 
-    textarea({ className: 'textarea', rows: '10', ...props }));
+    textarea({ rows: '10', ...props }));
 
 let dropdownContent = ({ active }, ...children) =>
   div({ className: `dropdown-content ${active ? 'active' : ''}` }, ...children);
 
 let selectedItem = ({ ref, name, active}) =>
-  div({ className: 'selected-item option', ref }, 
+  div({ className: 'selected-item', ref }, 
     name || 'Select', 
     arrowIcon({ active }));
 

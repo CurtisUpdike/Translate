@@ -1,8 +1,8 @@
 ﻿@page
 @model IndexModel
 
-<form class="grid" method="post">
-    <div>
+<form class="app" method="post">
+    <div class="form-section">
         <select asp-for="SourceId" asp-items="Model.SourceOptions" class="form-select" aria-label="Source language">
             <option value="">-- Select Language --</option>
         </select>
@@ -11,7 +11,7 @@
             <button>Translate</button>
         </div>
     </div>
-    <div>
+    <div class="form-section">
         <select asp-for="TargetId" asp-items="Model.TargetOptions" class="form-select" aria-label="Target language">
             <option value="">-- Select Language --</option>
         </select>
