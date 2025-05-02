@@ -21,16 +21,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapPost("/api/translate", (Translator translator, TranslateRequestBody body) =>
-    translator.Translate(body.Text, body.SourceId, body.TargetId));
+    translator.Translate(body.TargetId, body.Text, body.SourceId));
 
-app.MapPost("/api/identify", (Translator translator, IdentifyRequestBody body) =>
-    translator.Identify(body.Text));
-
-app.MapGet("/api/languages", (Translator translator) => translator.LanguagesJson);
+app.MapGet("/api/languages", (Translator translator) => translator.Languages);
 
 app.MapRazorPages();
 
 app.Run();
 
 public record TranslateRequestBody(string SourceId, string TargetId, string Text);
-public record IdentifyRequestBody(string Text);

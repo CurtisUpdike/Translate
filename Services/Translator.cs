@@ -1,68 +1,42 @@
-﻿using IBM.Watson.LanguageTranslator.v3;
-using IBM.Cloud.SDK.Core.Authentication.Iam;
-using IBM.Watson.LanguageTranslator.v3.Model;
+﻿using Azure;
+using Azure.AI.Translation.Text;
 
 namespace Translate.Services;
 
+public record Language(string Id, string Name);
+public record TranslationResult(string Translation, string? DetectedLanguage, float? DetectedConfidence);
+
 public class Translator
 {
-    private LanguageTranslatorService _translator;
+    private TextTranslationClient _client;
 
     public IEnumerable<Language> Languages =>
-        _translator.ListLanguages().Result._Languages;
-
-    public string LanguagesJson => _translator.ListLanguages().Response;
+        _client.GetSupportedLanguages().Value.Translation.Select(l =>
+            new Language(l.Key, l.Value.Name));
 
     public Translator(IConfiguration config)
     {
-        _translator = new("2018-05-01", new IamAuthenticator(
-            apikey: config["Translator:ApiKey"]));
-        _translator.SetServiceUrl(config["Translator:Url"]);
-        _translator.WithHeader("X-Watson-Learning-Opt-Out", "true");
+        string apiKey = config["Translator:ApiKey"] ?? string.Empty;
+        string region = config["Translator:Region"] ?? "eastus";
+        _client = new TextTranslationClient(new AzureKeyCredential(apiKey), region);
     }
 
-    public string Translate(string text, Language? source, Language? target)
+    public TranslationResult Translate(string? targetId, string? text, string? sourceId)
     {
-        if (source == null || target == null) return string.Empty;
+        if (string.IsNullOrWhiteSpace(targetId) || string.IsNullOrWhiteSpace(text))
+            return new TranslationResult(string.Empty, null, null);
 
         try
         {
-            var result = _translator.Translate(
-                text: new() { text },
-                source: source._Language,
-                target: target._Language);
-
-            return result?.Result.Translations[0]._Translation ?? string.Empty;
+            var response = _client.Translate(targetId, text, sourceId);
+            return new TranslationResult(
+                response.Value[0].Translations[0].Text,
+                response.Value[0].DetectedLanguage?.Language,
+                response.Value[0].DetectedLanguage?.Confidence);
         }
         catch
         {
-            return string.Empty;
+            return new TranslationResult(string.Empty, null, null);
         }
     }
-
-    public string Translate(string text, string sourceId, string targetId)
-    {
-        string EmptyJson = "{}";
-
-        if (string.IsNullOrWhiteSpace(text) || string.IsNullOrEmpty(targetId))
-            return EmptyJson;
-
-        if (sourceId == targetId) return text;
-
-        try
-        {
-            var result = _translator.Translate(
-                text: new() { text },
-                source: sourceId,
-                target: targetId);
-
-            return result.Response;
-        }
-        catch
-        {
-            return EmptyJson;
-        }
-    }
-
-    public string Identify(string text) => _translator.Identify(text).Response;
 }

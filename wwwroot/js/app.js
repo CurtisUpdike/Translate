@@ -20,8 +20,7 @@ function App() {
   const detectDefault = { id: null, name: 'Detect Language'};
   const maxLength = 10000;
 
-  let [allSources, setAllSources] = useState([]);
-  let [allTargets, setAllTargets] = useState([]);
+  let [languages, setLanguages] = useState([]);
   let [source, setSource] = useState(detectDefault);
   let [target, setTarget] = useState(null);
   let [translation, setTranslation] = useState('');
@@ -30,14 +29,8 @@ function App() {
   let inputRef = useRef();
 
   useEffect(() => {
-    loadLanguages();
+    api.languages().then(setLanguages);
   }, []);
-
-  async function loadLanguages() {
-    let languages = await api.languages();
-    setAllSources([detectDefault, ...languages.filter(l => l.supportedAsSource)]);
-    setAllTargets(languages.filter(l => l.supportedAsTarget));
-  }
 
   function handleInput(event) {
     setCharacterCount(event.target.value.length);
@@ -55,7 +48,12 @@ function App() {
   }
 
   async function translate(sourceId, targetId) {
-    if (!targetId || !inputRef.current.value) return;
+    if (!targetId || !inputRef.current.value) {
+      setDetected(null);
+      setTranslation(''); 
+      return;
+    }
+
     if (sourceId === targetId) return;
 
     let result = await api.translate(inputRef.current.value, sourceId, targetId)
@@ -70,7 +68,7 @@ function App() {
     }
   }
 
-  let getLanguageName = (languageId) => allSources
+  let getLanguageName = (languageId) => languages
     .filter(l => l.id === languageId)
     .map(l => l.name)
     .at(0) || null;
@@ -79,7 +77,7 @@ function App() {
     appContainer(
       inputContainer(
         dropdown({ 
-          languages: allSources, 
+          languages: [detectDefault, ...languages], 
           selected: source,
           select: handleSourceChange,
         }),
@@ -91,7 +89,7 @@ function App() {
       ),
       outputContainer(
         dropdown({ 
-          languages: allTargets,
+          languages: languages,
           selected: target,
           select: handleTargetChange,
         }),
@@ -215,7 +213,7 @@ function DetectLanguage({ detected }) {
 
   let values = ['low', 'medium', 'high'];
   let index = Math.floor((detected.confidence / (1 / values.length)));
-  let value = values[index];
+  let value = values[index] || values[values.length - 1];
 
   return (
     div({ className: 'detected'},
@@ -340,11 +338,9 @@ let api = {
     let response = await fetch('/api/languages');
     let body = await response.json();
 
-    return body.languages.map(l => ({
-      id: l.language,
-      name: l.language_name,
-      supportedAsSource: l.supported_as_source,
-      supportedAsTarget: l.supported_as_target,
+    return body.map(l => ({
+      id: l.id,
+      name: l.name
     }))
   },
   
@@ -357,20 +353,9 @@ let api = {
     let body = await response.json();
 
     return {
-      translation: body.translations?.at(0).translation,
-      detectedLanguage: body.detected_language,
-      detectedConfidence: body.detected_language_confidence
+      translation: body.translation,
+      detectedLanguage: body.detectedLanguage,
+      detectedConfidence: body.detectedConfidence
     };
-  },
-
-  identify: async (text) => {
-    let response = await fetch('/api/identify', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
-    })
-
-    let { languages } = await response.json();
-    return languages[0];
   }
 };

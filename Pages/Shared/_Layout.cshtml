@@ -19,11 +19,11 @@
     </main>
 
     <footer>
-        <a href="https://github.com/CurtisUpdike/Translate">Source on GitHub</a>. Made with <a href="https://www.ibm.com/watson">IBM Watson</a>.
+        Source on <a href="https://github.com/CurtisUpdike/Translate">GitHub</a>.
     </footer>
 
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="~/js/app.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
